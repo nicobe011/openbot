@@ -544,7 +544,10 @@ export class OpenBotToolRouter {
             if (toolRequest.params.tool === "report_progress") {
               const parsed = reportProgressToolSchema.safeParse(toolRequest.params.arguments);
               if (!parsed.success) {
-                client.respond(toolRequest.id, openBotToolFailure(`${z.prettifyError(parsed.error)}\nCorrect the arguments and retry.`));
+                client.respond(
+                  toolRequest.id,
+                  openBotToolFailure(`${z.prettifyError(parsed.error)}\nCorrect the arguments and retry.`),
+                );
                 return;
               }
               const agentId = this.#conversation.agentForThread(toolRequest.params.threadId);
