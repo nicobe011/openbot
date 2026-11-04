@@ -11,7 +11,9 @@ describe("agentBrowserProfile", () => {
   });
 
   it("gives a named profile precedence over the agent-session setting", () => {
-    expect(agentBrowserProfile({ ownBrowserSession: false, browserProfileId: "0123456789abcdef0123456789abcdef" })).toEqual({
+    expect(
+      agentBrowserProfile({ ownBrowserSession: false, browserProfileId: "0123456789abcdef0123456789abcdef" }),
+    ).toEqual({
       kind: "profile",
       profileId: "0123456789abcdef0123456789abcdef",
     });
