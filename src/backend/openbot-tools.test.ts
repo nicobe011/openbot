@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { reportProgressToolSchema } from "./openbot-tools";
 import { VISIBLE_TOOL_DEFINITIONS } from "./agent/tool-catalog";
+import { reportProgressToolSchema } from "./openbot-tools";
 
 describe("report_progress", () => {
   it("accepts one bounded user-facing progress message", () => {
