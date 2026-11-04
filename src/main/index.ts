@@ -970,8 +970,9 @@ async function presentApplication(): Promise<void> {
     process.platform === "linux" ||
     ((process.platform === "darwin" || process.platform === "win32") && app.isPackaged)
   ) {
-    if (!app.setAsDefaultProtocolClient("openbot")) {
-      logger.warn("Unable to register the openbot:// scheme. Invitation links will not open OpenBot.");
+    const scheme = evolutionBuild ? "openbot-evolution" : "openbot";
+    if (!app.setAsDefaultProtocolClient(scheme)) {
+      logger.warn(`Unable to register the ${scheme}:// scheme. Invitation links will not open this application.`);
     }
   }
 }
