@@ -299,6 +299,26 @@ export function createThreadToken(thread: ComposerThread): HTMLSpanElement {
   return token;
 }
 
+export function createSurfaceToken(surface: { id: string; name: string }): HTMLSpanElement {
+  const token = document.createElement("span");
+  token.className = `composer-mention-token ${referenceChipClasses.root}`;
+  token.dataset.kind = "surface";
+  token.dataset.surfaceId = surface.id;
+  token.dataset.surfaceName = surface.name;
+  token.title = surface.name;
+  token.contentEditable = "false";
+  token.setAttribute("aria-label", surface.name);
+  const iconWrap = document.createElement("span");
+  iconWrap.className = referenceChipClasses.icon;
+  iconWrap.setAttribute("aria-hidden", "true");
+  iconWrap.append(createChipGlyph("blocks", BLOCKS_GLYPH));
+  const nameElement = document.createElement("span");
+  nameElement.className = referenceChipClasses.name;
+  nameElement.textContent = `@${surface.name}`;
+  token.replaceChildren(iconWrap, nameElement);
+  return token;
+}
+
 /*
  * A tab or a thread that is gone keeps its tag in the draft, drawn with the outline of a removed
  * skill. The provider then reads that it is closed or deleted.
@@ -473,6 +493,11 @@ export function renderEditorValue(
     }
     if (semanticReference?.kind === "quote") {
       editor.append(createQuoteToken(semanticReference.id, semanticReference.name));
+      cursor = index + match[0].length;
+      continue;
+    }
+    if (semanticReference?.kind === "surface") {
+      editor.append(createSurfaceToken({ id: semanticReference.id, name: semanticReference.name }));
       cursor = index + match[0].length;
       continue;
     }
