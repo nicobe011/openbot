@@ -16,16 +16,48 @@ export interface PickerFrame {
   bottom: number;
 }
 
-export interface ComposerSurface { id: "browser" | "computer" | "files" | "memory" | "workflows" | "teach" | "operations"; name: string; description: string; }
+export interface ComposerSurface {
+  id: "browser" | "computer" | "files" | "memory" | "workflows" | "teach" | "operations";
+  name: string;
+  description: string;
+}
 
 export const COMPOSER_SURFACES: readonly ComposerSurface[] = [
-  { id: "browser", name: "Navegador", description: "Use o navegador isolado deste agente e suas abas persistentes" },
-  { id: "computer", name: "Computador", description: "Use o computador, terminal e ambiente de execução deste agente" },
-  { id: "files", name: "Arquivos", description: "Trabalhe com arquivos e pastas do workspace deste agente" },
-  { id: "memory", name: "Memória", description: "Consulte ou atualize a memória persistente do agente" },
-  { id: "workflows", name: "Workflows", description: "Crie, leia, execute ou depure workflows e rotinas" },
-  { id: "teach", name: "Teach", description: "Aprenda uma tarefa recente e transforme-a em skill reutilizável" },
-  { id: "operations", name: "Operações", description: "Inspecione progresso, subagentes, tarefas, navegador e passos capturados" },
+  {
+    id: "browser",
+    name: "Navegador",
+    description: "Use o navegador isolado deste agente e suas abas persistentes",
+  },
+  {
+    id: "computer",
+    name: "Computador",
+    description: "Use o computador, terminal e ambiente de execução deste agente",
+  },
+  {
+    id: "files",
+    name: "Arquivos",
+    description: "Trabalhe com arquivos e pastas do workspace deste agente",
+  },
+  {
+    id: "memory",
+    name: "Memória",
+    description: "Consulte ou atualize a memória persistente do agente",
+  },
+  {
+    id: "workflows",
+    name: "Workflows",
+    description: "Crie, leia, execute ou depure workflows e rotinas",
+  },
+  {
+    id: "teach",
+    name: "Teach",
+    description: "Aprenda uma tarefa recente e transforme-a em skill reutilizável",
+  },
+  {
+    id: "operations",
+    name: "Operações",
+    description: "Inspecione progresso, subagentes, tarefas, navegador e passos capturados",
+  },
 ] as const;
 
 export interface ComposerCommand {
@@ -36,14 +68,54 @@ export interface ComposerCommand {
 }
 
 export const COMPOSER_COMMANDS: readonly ComposerCommand[] = [
-  { id: "teach", name: "/teach", insertion: "/teach", description: "Aprender o fluxo recente e criar ou revisar uma skill" },
-  { id: "review", name: "/review", insertion: "/review", description: "Revisar o trabalho atual, validar o resultado e apontar falhas" },
-  { id: "council", name: "/council", insertion: "/council", description: "Pedir análises independentes a vários agentes e sintetizar a melhor resposta" },
-  { id: "debug", name: "/debug", insertion: "/debug", description: "Investigar a timeline, ferramentas, tentativas e a causa de uma falha" },
-  { id: "goal", name: "/goal", insertion: "/goal", description: "Definir ou atualizar um objetivo permanente do agente" },
-  { id: "run", name: "/run", insertion: "/run", description: "Executar uma skill, workflow ou rotina pelo nome" },
-  { id: "search", name: "/search", insertion: "/search", description: "Pesquisar contexto, histórico, memória, arquivos ou web conforme a solicitação" },
-  { id: "interrupt", name: "/interrupt", insertion: "/interrupt", description: "Interromper trabalho em andamento ou uma tarefa/subagente relacionado" },
+  {
+    id: "teach",
+    name: "/teach",
+    insertion: "/teach",
+    description: "Aprender o fluxo recente e criar ou revisar uma skill",
+  },
+  {
+    id: "review",
+    name: "/review",
+    insertion: "/review",
+    description: "Revisar o trabalho atual, validar o resultado e apontar falhas",
+  },
+  {
+    id: "council",
+    name: "/council",
+    insertion: "/council",
+    description: "Pedir análises independentes a vários agentes e sintetizar a melhor resposta",
+  },
+  {
+    id: "debug",
+    name: "/debug",
+    insertion: "/debug",
+    description: "Investigar a timeline, ferramentas, tentativas e a causa de uma falha",
+  },
+  {
+    id: "goal",
+    name: "/goal",
+    insertion: "/goal",
+    description: "Definir ou atualizar um objetivo permanente do agente",
+  },
+  {
+    id: "run",
+    name: "/run",
+    insertion: "/run",
+    description: "Executar uma skill, workflow ou rotina pelo nome",
+  },
+  {
+    id: "search",
+    name: "/search",
+    insertion: "/search",
+    description: "Pesquisar contexto, histórico, memória, arquivos ou web conforme a solicitação",
+  },
+  {
+    id: "interrupt",
+    name: "/interrupt",
+    insertion: "/interrupt",
+    description: "Interromper trabalho em andamento ou uma tarefa/subagente relacionado",
+  },
 ] as const;
 
 export type PickerOption =
