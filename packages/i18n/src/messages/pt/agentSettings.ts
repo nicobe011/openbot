@@ -223,7 +223,7 @@ export const messages = {
     "Permite que o agente inicie um novo chat quando o chat dele ficar longo. Ele salva notas antes.",
   "agentSettings.quickAcknowledgement.title": "Mostrar o plano antes de tarefas longas",
   "agentSettings.quickAcknowledgement.description":
-    "Antes de uma tarefa longa, o agente mostra o plano. Ele começa após 10 s ou quando você toca em Iniciar.",
+    "Antes de uma tarefa longa, o agente mostra o plano e depois publica atualizações curtas quando o trabalho muda de etapa. Ele começa após 10 s ou quando você toca em Iniciar.",
   "agentSettings.browserProfile.label": "Perfil do navegador",
   "agentSettings.browserProfile.shared": "Compartilhado",
   "agentSettings.browserProfile.agent": "Somente este agente",
@@ -231,7 +231,7 @@ export const messages = {
   "agentSettings.browserProfile.new": "Novo perfil",
   "agentSettings.browserProfile.manageTitle": "Perfis do navegador",
   "agentSettings.browserProfile.manageDescription":
-    "Cada perfil mantém logins e cookies próprios. Uma mudança fecha as abas abertas do agente.",
+    "Os agentes começam com logins e cookies próprios. Compartilhado faz os agentes usarem a mesma sessão do navegador. Uma mudança fecha as abas abertas do agente.",
   "agentSettings.browserProfile.manage": "Gerenciar",
   "agentSettings.runtime.workspaceEnforcedProcess":
     "Todo o processo do {provider} é executado em um ambiente isolado, por isso a gravação fora desses locais falha. Disponível somente no macOS.",
