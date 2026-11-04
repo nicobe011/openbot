@@ -1097,7 +1097,7 @@ export async function createApplicationServices({
     homedir(),
     new OpenBotDatabase(app.getPath("userData")),
     () => agentDefaults.get(),
-    localServerChild?.agentRoot,
+    localServerChild?.agentRoot ?? (isEvolutionBuild() ? join(homedir(), "OpenBot Evolution") : undefined),
   );
   // Phase marks for `dev:bench`, so a slow start shows which group of awaits it waited on. They
   // change nothing.
