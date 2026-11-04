@@ -1686,6 +1686,7 @@ export class AgentStore {
       reasoningEffort: DEFAULT_REASONING_EFFORT,
       access: DEFAULT_AGENT_ACCESS,
       computerUse: true,
+      ownBrowserSession: true,
       threadId: null,
       workspacePath: join(this.#agentsRoot, id),
       preview: NEW_AGENT_PREVIEW,
