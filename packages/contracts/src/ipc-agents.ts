@@ -53,11 +53,11 @@ export const AGENT_DEFAULT_KEYS = ["allowAutomation", "allowNewChat", "quickAckn
 export type AgentDefaultKey = (typeof AGENT_DEFAULT_KEYS)[number];
 export type AgentDefaults = Record<AgentDefaultKey, boolean>;
 
-/** Safe account defaults. Long tasks acknowledge their plan by default; automation and new chats still require opt-in. */
+/** Off, which is what every agent had before the defaults existed. */
 export const DEFAULT_AGENT_DEFAULTS: AgentDefaults = {
   allowAutomation: false,
   allowNewChat: false,
-  quickAcknowledgement: true,
+  quickAcknowledgement: false,
 };
 
 export function isAgentDefaults(value: unknown): value is AgentDefaults {
