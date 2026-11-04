@@ -11,7 +11,7 @@
  * the name. Message bodies are stored as written, so an older app reading a newer message is a
  * real case, and it stays readable.
  */
-export type ChatTagKind = "agent" | "skill" | "mcp" | "quote" | "tab" | "thread";
+export type ChatTagKind = "agent" | "skill" | "mcp" | "quote" | "tab" | "thread" | "surface";
 
 export interface ChatTagReference {
   kind: ChatTagKind;
@@ -21,7 +21,7 @@ export interface ChatTagReference {
   end: number;
 }
 
-const CHAT_TAG_REFERENCE_PATTERN = /@\[([^\]\r\n]+)\]\((agent|skill|mcp|quote|tab|thread)(\+uri)?:([^)\r\n]+)\)/gu;
+const CHAT_TAG_REFERENCE_PATTERN = /@\[([^\]\r\n]+)\]\((agent|skill|mcp|quote|tab|thread|surface)(\+uri)?:([^)\r\n]+)\)/gu;
 
 /*
  * Quoted text is any text, and Markdown reads the marker as a link. A bracket, a backslash, a
@@ -123,7 +123,7 @@ export function leadingAddress(value: string): { mentions: ChatTagReference[]; e
 }
 
 function chatTagKind(value: string | undefined): ChatTagKind {
-  if (value === "skill" || value === "mcp" || value === "quote" || value === "tab" || value === "thread") return value;
+  if (value === "skill" || value === "mcp" || value === "quote" || value === "tab" || value === "thread" || value === "surface") return value;
   return "agent";
 }
 
@@ -205,8 +205,9 @@ function fileQuoteHeading(file: FileQuoteTarget): string {
 }
 
 /** What the provider reads in place of a marker. A name alone would not say what it names. */
-function expandedChatTag(kind: "agent" | "skill" | "mcp", name: string): string {
+function expandedChatTag(kind: "agent" | "skill" | "mcp" | "surface", name: string): string {
   if (kind === "agent") return `@${name}`;
+  if (kind === "surface") return `${name} (OpenBot surface)`;
   return kind === "mcp" ? `${name} (MCP server)` : `${name} (skill)`;
 }
 
