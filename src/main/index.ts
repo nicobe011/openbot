@@ -46,8 +46,8 @@ import {
   readDevelopmentRemoteDebuggingPort,
   shouldAutoStartHost,
 } from "./development-profile";
-import { stopStuckExitAfterLimit } from "./exit-watchdog";
 import { configureEvolutionIdentity } from "./evolution-variant";
+import { stopStuckExitAfterLimit } from "./exit-watchdog";
 import { filePreviewPages } from "./file-preview-pages";
 import { hostAllowsTenantLaunch } from "./host-update-coordinator";
 import { takeHostedServerEnvironment } from "./hosted-server-bootstrap";
