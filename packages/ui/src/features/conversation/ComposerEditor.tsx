@@ -754,17 +754,17 @@ export function ComposerEditor(props: ComposerEditorProps) {
         ? createSurfaceToken(option.surface)
         : option.type === "agent"
           ? createMentionToken(option.agent)
-        : option.type === "everyone"
-          ? document.createTextNode(EVERYONE_MENTION)
-          : option.type === "skill"
-            ? createSkillToken(option.skill)
-            : option.type === "mcp"
-              ? createMcpToken(option.server)
-              : option.type === "tab"
-                ? createTabToken(option.tab)
-                : option.type === "thread"
-                  ? createThreadToken(option.thread)
-                  : createAttachmentToken(option.attachment, attachmentTokenActions);
+          : option.type === "everyone"
+            ? document.createTextNode(EVERYONE_MENTION)
+            : option.type === "skill"
+              ? createSkillToken(option.skill)
+              : option.type === "mcp"
+                ? createMcpToken(option.server)
+                : option.type === "tab"
+                  ? createTabToken(option.tab)
+                  : option.type === "thread"
+                    ? createThreadToken(option.thread)
+                    : createAttachmentToken(option.attachment, attachmentTokenActions);
     const trailingSpace = document.createTextNode(" ");
     range.insertNode(trailingSpace);
     range.insertNode(token);
