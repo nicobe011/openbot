@@ -7,6 +7,31 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* Portraits of the parallel workers. Show a maximum of four to limit animation work. */
+.subagents-faces {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  padding-inline-end: var(--openbot-space-1);
+}
+
+.subagents-faces .subagents-face {
+  width: var(--openbot-space-6);
+  height: var(--openbot-space-6);
+  flex: 0 0 auto;
+  margin-inline-start: calc(-1 * var(--openbot-space-2));
+}
+
+.subagents-faces .subagents-face:first-child {
+  margin-inline-start: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .subagents-faces .subagents-face {
+    animation: none;
+  }
+}
+
 /* The live line: the icon of the current step and its text. */
 
 .subagents-live {
