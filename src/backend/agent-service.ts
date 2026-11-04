@@ -1000,6 +1000,7 @@ export class AgentService extends EventEmitter<AgentServiceEvents> {
       memories: this.#memories,
       routines: this.#routines,
       hooks: {
+        emit: (event) => this.#emit(event),
         listAgents: () => this.listAgents(),
         deleteAgentData: (agent) => this.#removal.deleteData(agent).pipe(toAgentDuplicationFailed),
         hasAttentionFor: (agentId) => this.#attention.hasAttentionFor(agentId),
@@ -1649,7 +1650,6 @@ export class AgentService extends EventEmitter<AgentServiceEvents> {
       apiKeys: options.agentApiKeys ?? null,
       vaultItems: options.vaultItems ?? null,
       hooks: {
-        emit: (event) => this.#emit(event),
         listAgents: () => this.listAgents(),
         listModels: () => this.listModels(),
         providerAccounts: (provider) => this.getStatus().providers?.find((row) => row.id === provider)?.accounts,
