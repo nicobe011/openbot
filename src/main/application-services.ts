@@ -264,7 +264,12 @@ import {
   sendComputerUseHighlightPlacement,
   showMainWindow,
 } from "./main-window";
-import { DATA_SKILL_SLUG, ManagedSkillService, SKILL_CREATOR_SKILL_SLUG, TEACH_TASK_SKILL_SLUG } from "./managed-skill-service";
+import {
+  DATA_SKILL_SLUG,
+  ManagedSkillService,
+  SKILL_CREATOR_SKILL_SLUG,
+  TEACH_TASK_SKILL_SLUG,
+} from "./managed-skill-service";
 import { McpHostSignIns } from "./mcp-host-sign-ins";
 import { McpOAuthProxySettingsFile } from "./mcp-oauth-proxy-store";
 import {
