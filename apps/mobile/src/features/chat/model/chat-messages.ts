@@ -7,6 +7,7 @@ import type {
   ChannelRoutingConversationEvent,
   ConversationMessage,
   ConversationMessageSender,
+  ConversationSubagent,
   ConversationQuestionPrompt,
   ConversationReaction,
   ImageGenerationInfo,
@@ -91,6 +92,11 @@ export type ChatMessage =
       reactions?: readonly ConversationReaction[];
     }
   /** The task list of an agent plan. The header is `heading` when set, else a catalog title. */
+  | {
+      id: string;
+      kind: "subagents";
+      subagents: readonly ConversationSubagent[];
+    }
   | {
       id: string;
       kind: "plan";
@@ -373,6 +379,14 @@ export function projectChatMessages(
           uiBlock: message.uiBlock,
         })),
       );
+      continue;
+    }
+    // The mobile list uses the same typed subagent snapshot as desktop; these are
+    // independent parallel workers, not an assistant text bubble.
+    if (message.author === "assistant" && message.itemType === CONVERSATION_SUBAGENTS_ITEM_TYPE) {
+      if (message.subagents?.length) {
+        result.push({ id: message.id, kind: "subagents", subagents: message.subagents });
+      }
       continue;
     }
     // A generation has no text or attachment until its image arrives, and it still needs its placeholder.
