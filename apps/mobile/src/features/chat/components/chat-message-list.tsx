@@ -58,8 +58,8 @@ import { type ApprovalDecision, approvalTitle, ChatApprovalCard } from "@/featur
 import { ChatExchangeGroup, ChatExchangeMarker } from "@/features/chat/components/chat-exchange-marker";
 import { ChatMarkdown } from "@/features/chat/components/chat-markdown";
 import { ChatPlan } from "@/features/chat/components/chat-plan";
-import { ChatSubagents } from "@/features/chat/components/chat-subagents";
 import { ChatQuestionPrompt } from "@/features/chat/components/chat-question-prompt";
+import { ChatSubagents } from "@/features/chat/components/chat-subagents";
 import { ChatTurnStepsRow } from "@/features/chat/components/chat-turn-steps-row";
 import { useActivityPresence } from "@/features/chat/components/use-activity-presence";
 import { CHAT_ROW_GAP, type ChatMotion } from "@/features/chat/components/use-chat-motion";
