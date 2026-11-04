@@ -1,6 +1,6 @@
 # OpenBot team launch catalog
 
-Version v4 contains 41 Skills and 27 Agents. The `pstack` Skill installs 52 skills `pstack-<name>` with it. Four Skills and four Agents are featured on first publication. All entries show the public OpenBot logo as their creator badge, use the publisher **OpenBot**, and start with zero installs. An Agent's `routines` in `catalog.json` use the Marketplace routine shape, and the build checks them as the account service does. The schedules use the installer's timezone.
+Version v5 contains 42 Skills and 27 Agents. The `pstack` Skill installs 52 skills `pstack-<name>` with it. Four Skills and four Agents are featured on first publication. All entries show the public OpenBot logo as their creator badge, use the publisher **OpenBot**, and start with zero installs. An Agent's `routines` in `catalog.json` use the Marketplace routine shape, and the build checks them as the account service does. The schedules use the installer's timezone.
 
 Each Agent has one job and a named result, in its title. Its instructions name two input paths (a tool such as the browser, an installed plugin or the repository; else pasted or uploaded material), one approval gate, the evidence each claim needs, a fixed rubric for judgment work, and the adjacent work that belongs to another Agent. Agents with a routine install it active. A routine first reads its saved setup. With no setup, the first run sends one short setup request and later runs stay quiet; a run with nothing new calls `routine_no_update` and sends no message. Dr. Eggbot's two healthchecks still install paused. State that an Agent keeps, such as a saved site address or a care log, goes in a shared data table named for what it holds, on the user's computer.
 
@@ -102,6 +102,7 @@ Do not use the separate `skills:seed`, `agents:seed`, or `dev:seed` demo scripts
 | [campaign-analysis](skills/campaign-analysis/SKILL.md) | data-analytics | openbot |
 | [data-quality-review](skills/data-quality-review/SKILL.md) | data-analytics | openbot |
 | [workflow-playbook](skills/workflow-playbook/SKILL.md) | automation | openbot |
+| [learn-workflow](skills/learn-workflow/SKILL.md) | automation | openbot |
 | [hiring-scorecard](skills/hiring-scorecard/SKILL.md) | other | openbot |
 | [acceptance-check](skills/acceptance-check/SKILL.md) | coding | openbot |
 | [pr-follow-up](skills/pr-follow-up/SKILL.md) | coding | openbot |
