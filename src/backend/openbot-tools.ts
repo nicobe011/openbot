@@ -172,12 +172,6 @@ export const routineReportFailureToolSchema = z.object({
 /** `acknowledge_request`: the action ids of its plan card. */
 export const ACKNOWLEDGE_REQUEST_ACTIONS = { start: "start", alternative: "alternative", cancel: "cancel" } as const;
 
-export const reportProgressToolSchema = z.object({
-  message: uiTextSchema(UI_BLOCK_LIMITS.text).describe(
-    "One short user-facing status update about the work that is happening now. State the concrete phase or result, not private reasoning.",
-  ),
-});
-
 export const acknowledgeRequestToolSchema = z.object({
   message: uiTextSchema(UI_BLOCK_LIMITS.title).describe(
     "One short sentence: you are on it, and what the work is. Such as: On it. This is my plan for the 502 on staging.",
@@ -660,12 +654,6 @@ export const OPENBOT_TOOL_DEFINITIONS: readonly OpenBotToolDefinition[] = [
         .min(1)
         .max(3),
     },
-  },
-  {
-    name: "report_progress",
-    description:
-      "Publish one short user-facing progress update for the current long-running turn. Use it when the work moves to a new material phase or when a useful partial result is ready. Do not expose private reasoning, repeat the plan, or send a heartbeat.",
-    shape: reportProgressToolSchema.shape,
   },
   {
     name: "acknowledge_request",
