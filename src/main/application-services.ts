@@ -203,6 +203,7 @@ import {
 } from "./development-remote-bootstrap";
 import { performDynamicIslandCriticalAction } from "./dynamic-island-actions";
 import { DynamicIslandFailed, DynamicIslandWindowController, toDynamicIslandFailed } from "./dynamic-island-window";
+import { isEvolutionBuild } from "./evolution-variant";
 import {
   createExternalLinkPreferenceStore,
   ExternalLinkOpener,
