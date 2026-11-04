@@ -2,7 +2,7 @@ import { type ChatTagKind, chatTagReferences } from "@openbot/contracts/chat-tag
 import type { AttachmentSummary } from "@openbot/contracts/ipc";
 import type { AppTextKey } from "@openbot/i18n";
 import { AppWindow, Blocks, Button, Puzzle, Split, TextQuote } from "@openbot/ui";
-import { ReferenceChip } from "@openbot/ui/reference-chip";
+import { ReferenceChip, referenceChipClasses } from "@openbot/ui/reference-chip";
 import { usesTouchLayout } from "@openbot/ui/utils";
 import type { JSX } from "@solidjs/web";
 import { createMemo, createSignal, createUniqueId, For, Show, untrack } from "solid-js";
@@ -57,7 +57,7 @@ const UNAVAILABLE_TAG_LABELS = {
  * keeps the name it had when the message was sent, as an MCP server does: the message records what
  * the user asked.
  */
-type UnavailableTagKind = Exclude<ChatTagKind, "quote" | "tab" | "thread">;
+type UnavailableTagKind = Exclude<ChatTagKind, "quote" | "tab" | "thread" | "surface">;
 
 export function RichMessageText(props: RichMessageTextProps) {
   const { t } = useText();
@@ -214,6 +214,22 @@ export function RichMessageText(props: RichMessageTextProps) {
                 icon={reference.kind === "tab" ? <AppWindow /> : <Split />}
                 onClick={onOpenTag ? () => onOpenTag(reference.kind, reference.id) : undefined}
               />
+            );
+          }
+          if (part.surfaceName) {
+            return (
+              <span
+                class={[referenceChipClasses.root, "message-reference-chip"]}
+                data-kind="surface"
+                title={part.surfaceName}
+              >
+                <span class={referenceChipClasses.icon} aria-hidden="true">
+                  <Blocks />
+                </span>
+                <span class={referenceChipClasses.name} dir="auto">
+                  @{part.surfaceName}
+                </span>
+              </span>
             );
           }
           if (part.unavailableKind) {
@@ -401,6 +417,7 @@ interface RichMessagePart {
   /** A browser tab, by tab id, or a side thread, by task id. */
   reference?: { kind: "tab" | "thread"; id: string };
   unavailableKind?: UnavailableTagKind;
+  surfaceName?: string;
   citation?: MessageCitation;
   attachment?: AttachmentSummary;
   sharedPath?: string;
@@ -473,6 +490,8 @@ function semanticTagParts(body: string, agents: ComposerAgent[], skills: Compose
       parts.push({ text: reference.name, quote: { messageId: reference.id, text: reference.name } });
     } else if (reference.kind === "tab" || reference.kind === "thread") {
       parts.push({ text: reference.name, reference: { kind: reference.kind, id: reference.id } });
+    } else if (reference.kind === "surface") {
+      parts.push({ text: reference.name, surfaceName: reference.name });
     } else {
       const skill = skills.find(
         (candidate) => candidate.skillId === reference.id && candidate.state !== "needs-repair",
