@@ -53,11 +53,11 @@ export const AGENT_DEFAULT_KEYS = ["allowAutomation", "allowNewChat", "quickAckn
 export type AgentDefaultKey = (typeof AGENT_DEFAULT_KEYS)[number];
 export type AgentDefaults = Record<AgentDefaultKey, boolean>;
 
-/** Off, which is what every agent had before the defaults existed. */
+/** Safe account defaults. Long tasks acknowledge their plan by default; automation and new chats still require opt-in. */
 export const DEFAULT_AGENT_DEFAULTS: AgentDefaults = {
   allowAutomation: false,
   allowNewChat: false,
-  quickAcknowledgement: false,
+  quickAcknowledgement: true,
 };
 
 export function isAgentDefaults(value: unknown): value is AgentDefaults {
@@ -252,7 +252,7 @@ export interface AgentSummary {
   quickAcknowledgement?: boolean;
   /**
    * Whether the browser tabs of the agent use a session of their own, with their own cookies and
-   * sign-ins. Local-only, like `access`. Absent means off: the tabs use the shared session. When
+   * sign-ins. Local-only, like `access`. New agents opt in explicitly so each agent starts isolated. When
    * `browserProfileId` is also set, the named profile applies; see `agentBrowserProfile`.
    */
   ownBrowserSession?: boolean;
