@@ -89,5 +89,4 @@ describe("mobile parallel agents projection", () => {
       },
     ]);
   });
-
 });
