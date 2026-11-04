@@ -11,7 +11,11 @@ extraResources:
   - from: resources/evolution-build.json
     to: evolution-build.json
 nsis:
+  include: build/installer-evolution.nsh
   oneClick: false
   allowToChangeInstallationDirectory: true
   shortcutName: OpenBot Evolution
   uninstallDisplayName: OpenBot Evolution
+
+directories:
+  output: dist-evolution
