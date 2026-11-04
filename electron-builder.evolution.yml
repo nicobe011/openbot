@@ -1,15 +1,15 @@
 extends: ./electron-builder.yml
 appId: app.openbot.evolution.desktop
 productName: OpenBot Evolution
+extraMetadata:
+  productName: OpenBot Evolution
+  openbotVariant: evolution
 artifactName: OpenBot-Evolution-${version}-${arch}.${ext}
 publish: null
 protocols:
   - name: OpenBot Evolution invitations
     schemes:
       - openbot-evolution
-extraResources:
-  - from: resources/evolution-build.json
-    to: evolution-build.json
 nsis:
   include: build/installer-evolution.nsh
   oneClick: false
