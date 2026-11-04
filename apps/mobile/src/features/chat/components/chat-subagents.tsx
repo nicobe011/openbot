@@ -103,18 +103,13 @@ export function ChatSubagents({ message }: { message: SubagentsMessage }) {
             {running && latest ? latest : progress}
           </Typography.Paragraph>
         </View>
-        <ChevronDown
-          size={17}
-          color={String(muted)}
-          style={{ transform: [{ rotate: open ? "0deg" : "-90deg" }] }}
-        />
+        <ChevronDown size={17} color={String(muted)} style={{ transform: [{ rotate: open ? "0deg" : "-90deg" }] }} />
       </Pressable>
       {open ? (
         <View className="gap-1 px-3 pb-3" accessibilityLabel={title}>
           {agents.map((agent: ConversationSubagent) => {
             const last = agent.steps.at(-1);
-            const detail =
-              agent.status === "failed" && agent.error ? agent.error : (last?.text ?? agent.prompt);
+            const detail = agent.status === "failed" && agent.error ? agent.error : (last?.text ?? agent.prompt);
             return (
               <View key={agent.id} className="flex-row items-start gap-2 rounded-lg px-1 py-2">
                 <View className="mt-0.5">
