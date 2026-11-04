@@ -4154,9 +4154,8 @@ try {
     );
     const empty = await admin(BROWSER_PROFILES_ROUTES.list);
     check(
-      "an admin lists no profile, and every agent in the shared profile",
-      empty.status === 200 &&
-        isDeepStrictEqual(empty.body, { profiles: [], sharedAgentIds: ["agent-ada", "agent-oc", "agent-pi"] }),
+      "an admin lists no named profile, and default agents use isolated sessions",
+      empty.status === 200 && isDeepStrictEqual(empty.body, { profiles: [], sharedAgentIds: [] }),
       summary(empty),
     );
     const created = await admin(BROWSER_PROFILES_ROUTES.create, { name: "Client A" });
@@ -4187,7 +4186,7 @@ try {
         isDeepStrictEqual(assigned.body, { kind: "profile", profileId }) &&
         isDeepStrictEqual(readBack.body, { kind: "profile", profileId }) &&
         isDeepStrictEqual(field(listed.body, "profiles", 0, "agentIds"), ["agent-ada"]) &&
-        isDeepStrictEqual(field(listed.body, "sharedAgentIds"), ["agent-oc", "agent-pi"]),
+        isDeepStrictEqual(field(listed.body, "sharedAgentIds"), []),
       [summary(assigned), summary(readBack), summary(listed)],
     );
     const unknownProfile = await admin(BROWSER_PROFILES_ROUTES.updateAgent, {
@@ -4208,7 +4207,7 @@ try {
         errorIs(unknownAgent, 404, sourceText("error.team.agentNotFound")) &&
         errorIs(hiddenRead, 404, sourceText("error.team.agentNotFound")) &&
         errorIs(hiddenAssign, 404, sourceText("error.team.agentNotFound")) &&
-        isDeepStrictEqual(field(olderList.body, "sharedAgentIds"), ["agent-oc"]) &&
+        isDeepStrictEqual(field(olderList.body, "sharedAgentIds"), []) &&
         callsOf("updateAgentBrowserProfile").length === 1,
       [summary(unknownProfile), summary(unknownAgent), summary(hiddenRead), summary(hiddenAssign), summary(olderList)],
     );
@@ -4259,11 +4258,11 @@ try {
     const afterDelete = await admin(BROWSER_PROFILES_ROUTES.list);
     const adaAfter = await admin(BROWSER_PROFILES_ROUTES.agent, { agentId: "agent-ada" });
     check(
-      "a delete moves the agents of the profile to the shared profile",
+      "a delete moves only the profile's agents to the shared profile",
       deleted.status === 200 &&
         isDeepStrictEqual(afterDelete.body, {
           profiles: [],
-          sharedAgentIds: ["agent-ada", "agent-oc", "agent-pi"],
+          sharedAgentIds: ["agent-ada"],
         }) &&
         isDeepStrictEqual(adaAfter.body, { kind: "shared" }),
       [summary(deleted), summary(afterDelete), summary(adaAfter)],
