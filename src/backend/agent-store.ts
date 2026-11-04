@@ -98,9 +98,9 @@ type PersistedStoredAgent = Omit<StoredAgent, "avatarUrl" | "provider" | "access
   allowAutomation?: boolean;
   // Absent means the account default, which is off until the user changes it in Settings › Agents.
   allowNewChat?: boolean;
-  // Absent means the account default, which is off until the user changes it in Settings › Agents.
+  // Absent means the account default; long-task acknowledgement is on by default.
   quickAcknowledgement?: boolean;
-  // Absent on every agent stored before the setting existed, which keeps its tabs in the shared browser session.
+  // Absent on older agents means an isolated agent browser session; false opts into the shared session.
   ownBrowserSession?: boolean;
   // Absent on every agent stored before named browser profiles existed. Stored with
   // `ownBrowserSession: true`, so an older OpenBot opens the agent's own session instead.
