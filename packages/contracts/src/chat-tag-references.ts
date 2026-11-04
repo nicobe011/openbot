@@ -162,6 +162,7 @@ export function expandChatTagReferences(
         return expanded;
       }
       if (kind === "tab" || kind === "thread") return resolveName?.(reference) ?? name;
+      if (kind === "surface") return expandedSurfaceTag(id, resolveName?.(reference) ?? name);
       const resolvedName = resolveName?.(reference) ?? name;
       return expandedChatTag(kind, resolvedName);
     },
@@ -205,9 +206,21 @@ function fileQuoteHeading(file: FileQuoteTarget): string {
 }
 
 /** What the provider reads in place of a marker. A name alone would not say what it names. */
-function expandedChatTag(kind: "agent" | "skill" | "mcp" | "surface", name: string): string {
+function expandedSurfaceTag(id: string, name: string): string {
+  const instruction: Record<string, string> = {
+    browser: "Use this agent's isolated persistent OpenBot browser. Prefer existing tabs and saved sign-ins before opening a new tab.",
+    computer: "Use this agent's Computer Use environment and terminal/workspace tools when the task needs desktop interaction or execution.",
+    files: "Work with this agent's workspace and allowed files. Prefer direct file tools over browser uploads when possible.",
+    memory: "Use the agent's persistent memories as context and update them only when the user asks or the memory rules allow it.",
+    workflows: "Use OpenBot workflows, routines and their run/debug tools for this request.",
+    teach: "Treat the recent successful or corrected work as a demonstration. Use the Teach a Task skill to create or revise a reusable skill.",
+    operations: "Inspect the task timeline, captured work steps, subagents, browser activity and progress before diagnosing or reporting status.",
+  };
+  return `${name} (OpenBot surface). ${instruction[id] ?? "Use the matching OpenBot tools for this surface."}`;
+}
+
+function expandedChatTag(kind: "agent" | "skill" | "mcp", name: string): string {
   if (kind === "agent") return `@${name}`;
-  if (kind === "surface") return `${name} (OpenBot surface)`;
   return kind === "mcp" ? `${name} (MCP server)` : `${name} (skill)`;
 }
 
