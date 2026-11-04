@@ -1,0 +1,58 @@
+name: Build OpenBot Evolution Windows
+
+on:
+  push:
+    branches:
+      - feature/openbot-evolution-mega
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: openbot-evolution-windows-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  windows:
+    name: Build OpenBot Evolution x64
+    runs-on: windows-2025
+    timeout-minutes: 50
+    env:
+      CSC_IDENTITY_AUTO_DISCOVERY: "false"
+    steps:
+      - name: Check out Evolution source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - name: Set up Bun and install dependencies
+        uses: ./.github/actions/setup-bun
+
+      - name: Lint Evolution changes
+        run: bun run lint
+
+      - name: Install provider runtimes
+        run: |
+          bun scripts/install-codex-runtime.ts win32 x64
+          bun scripts/install-claude-runtime.ts win32 x64
+          bun scripts/install-grok-runtime.ts win32 x64
+
+      - name: Build isolated Evolution NSIS installer
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: bun run dist:evolution:win
+
+      - name: Show produced artifacts
+        shell: pwsh
+        run: Get-ChildItem -Recurse dist-evolution | Select-Object FullName,Length
+
+      - name: Upload Evolution installer
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: OpenBot-Evolution-Windows-x64
+          path: |
+            dist-evolution/*.exe
+            dist-evolution/*.blockmap
+          if-no-files-found: error
+          retention-days: 14
