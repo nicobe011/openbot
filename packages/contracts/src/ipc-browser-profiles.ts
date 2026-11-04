@@ -46,13 +46,13 @@ export function browserProfileName(value: unknown): string | null {
  */
 export type AgentBrowserProfile = { kind: "shared" } | { kind: "agent" } | { kind: "profile"; profileId: string };
 
-/** The choice that the stored agent fields give. A named profile comes before the agent session. */
+/** The choice that the stored agent fields give. A named profile comes before the agent session. An absent setting uses an isolated agent session; `false` opts into the shared session. */
 export function agentBrowserProfile(agent: {
   ownBrowserSession?: boolean | undefined;
   browserProfileId?: string | undefined;
 }): AgentBrowserProfile {
   if (agent.browserProfileId !== undefined) return { kind: "profile", profileId: agent.browserProfileId };
-  return agent.ownBrowserSession === true ? { kind: "agent" } : { kind: "shared" };
+  return agent.ownBrowserSession === false ? { kind: "shared" } : { kind: "agent" };
 }
 
 export function sameAgentBrowserProfile(left: AgentBrowserProfile, right: AgentBrowserProfile): boolean {
