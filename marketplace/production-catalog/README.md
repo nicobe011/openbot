@@ -56,7 +56,7 @@ Do not use the separate `skills:seed`, `agents:seed`, or `dev:seed` demo scripts
 | Security Reviewer | `application-security-reviewer` | coding | Security risks ranked by impact, each with code evidence and a fix | `secure-code-guidance`, `repository-threat-model` | — |
 | QA Tester | `qa-tester` | coding | Pass or fail for a release, with screenshots and repro steps | `acceptance-check`, `bug-triage` | weekdays 09:00 |
 | PR Shepherd | `pr-shepherd` | coding | Open pull requests kept moving to green; you only decide what to merge | `pr-follow-up`, `change-review` | weekdays 10:00; weekdays 15:00 |
-| Skill Smith | `skill-smith` | automation | An API or a repeated task turned into a tested OpenBot skill | `api-skill-builder` | — |
+| Skill Smith | `skill-smith` | automation | An API or a repeated task turned into a tested OpenBot skill | `api-skill-builder`, `learn-workflow` | — |
 | Scope Writer ★ | `project-partner` | productivity | A dated scope with what is in, what is out and how done is measured; work waits for your approval | `project-plan`, `decision-quality-check` | — |
 | Prototype Builder | `prototype-builder` | design | A clickable prototype of your idea, with click-path screenshots and a short video; published only when you say | `prototype-build`, `distinctive-frontend-design` | — |
 | Launch Coordinator ★ | `launch-coordinator` | productivity | Release notes from merged work and a launch checklist with owners and checks, kept as a draft | `launch-notes`, `project-plan` | — |
