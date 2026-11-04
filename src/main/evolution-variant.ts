@@ -1,11 +1,21 @@
-import { existsSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { app } from "electron";
 
-export const EVOLUTION_BUILD_MARKER = "evolution-build.json";
+let cachedEvolutionBuild: boolean | undefined;
 
 export function isEvolutionBuild(): boolean {
-  return app.isPackaged && existsSync(join(process.resourcesPath, EVOLUTION_BUILD_MARKER));
+  if (!app.isPackaged) return false;
+  if (cachedEvolutionBuild !== undefined) return cachedEvolutionBuild;
+  try {
+    const metadata = JSON.parse(readFileSync(join(app.getAppPath(), "package.json"), "utf8")) as {
+      openbotVariant?: unknown;
+    };
+    cachedEvolutionBuild = metadata.openbotVariant === "evolution";
+  } catch {
+    cachedEvolutionBuild = false;
+  }
+  return cachedEvolutionBuild;
 }
 
 export function configureEvolutionIdentity(): boolean {
