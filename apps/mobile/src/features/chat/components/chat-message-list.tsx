@@ -58,6 +58,7 @@ import { type ApprovalDecision, approvalTitle, ChatApprovalCard } from "@/featur
 import { ChatExchangeGroup, ChatExchangeMarker } from "@/features/chat/components/chat-exchange-marker";
 import { ChatMarkdown } from "@/features/chat/components/chat-markdown";
 import { ChatPlan } from "@/features/chat/components/chat-plan";
+import { ChatSubagents } from "@/features/chat/components/chat-subagents";
 import { ChatQuestionPrompt } from "@/features/chat/components/chat-question-prompt";
 import { ChatTurnStepsRow } from "@/features/chat/components/chat-turn-steps-row";
 import { useActivityPresence } from "@/features/chat/components/use-activity-presence";
@@ -649,6 +650,8 @@ const MessageRow = memo(function MessageRow({
       <ChatExchangeMarker key={message.id} message={message} agents={agents} agentsById={agentsById} muted={muted} />
     ) : message.kind === "plan" ? (
       <ChatPlan key={message.id} message={message} />
+    ) : message.kind === "subagents" ? (
+      <ChatSubagents key={message.id} message={message} />
     ) : message.kind === "question" ? (
       <ChatQuestionPrompt
         key={message.id}
