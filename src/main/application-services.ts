@@ -3340,6 +3340,7 @@ export async function createApplicationServices({
       existsSync(HOSTED_UPDATE_TRIGGER));
   // A local server is the same application as its parent, which installs the update for both.
   const updatesEnabled =
+    !isEvolutionBuild() &&
     !localServerChild &&
     app.isPackaged &&
     !isNixStoreInstall() &&
