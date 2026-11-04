@@ -5,6 +5,7 @@ import type {
   AttachmentSummary,
   ChannelMessage,
   ChannelRoutingConversationEvent,
+  ConversationMemoryChange,
   ConversationMessage,
   ConversationMessageSender,
   ConversationQuestionPrompt,
@@ -16,6 +17,7 @@ import type {
   RoutineRunStatus,
 } from "@openbot/contracts/ipc";
 import {
+  CONVERSATION_MEMORY_CHANGES_ITEM_TYPE,
   CONVERSATION_PLAN_ITEM_TYPE,
   CONVERSATION_SUBAGENTS_ITEM_TYPE,
   channelRoutingConversationEvent,
@@ -90,6 +92,11 @@ export type ChatMessage =
       createdAt?: string;
       /** The reactions on the message: the reader's own and the agents'. */
       reactions?: readonly ConversationReaction[];
+    }
+  | {
+      id: string;
+      kind: "memory-changes";
+      changes: readonly ConversationMemoryChange[];
     }
   /** The task list of an agent plan. The header is `heading` when set, else a catalog title. */
   | {
@@ -379,6 +386,10 @@ export function projectChatMessages(
           uiBlock: message.uiBlock,
         })),
       );
+      continue;
+    }
+    if (message.itemType === CONVERSATION_MEMORY_CHANGES_ITEM_TYPE && message.memoryChanges?.length) {
+      result.push({ id: message.id, kind: "memory-changes", changes: message.memoryChanges });
       continue;
     }
     // The mobile list uses the same typed subagent snapshot as desktop; these are
