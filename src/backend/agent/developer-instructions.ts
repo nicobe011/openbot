@@ -362,7 +362,7 @@ export function developerInstructions(
     ...(agentAutomationAllowed(agent, agentDefaults) ? [automationInstructions(agent.id, automationRoot)] : []),
     ...(agentQuickAcknowledgementEnabled(agent, agentDefaults)
       ? [
-          "Before a long task, such as a fix, a build, research, or a change in many files, describe and call openbot.acknowledge_request first: it shows the user one acknowledgement line and your plan, and the work starts after 10 s or when the user presses start. Do not call it for a quick answer, a question, a small change, a routine run, or an external chat. After the card, do not repeat the plan as prose.",
+          "Before a long task, such as a fix, a build, research, or a change in many files, describe and call openbot.acknowledge_request first: it shows the user one acknowledgement line and your plan, and the work starts after 10 s or when the user presses start. Do not call it for a quick answer, a question, a small change, a routine run, or an external chat. After the card, do not repeat the plan as prose. During the work, call openbot.report_progress only when the task enters a new material phase or a useful partial result is ready, so the user sees real progress instead of a silent thinking state. Keep each update short and do not expose private reasoning.",
         ]
       : []),
     ...(options.memoriesInTurns
