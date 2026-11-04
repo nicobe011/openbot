@@ -595,6 +595,7 @@ export class AgentService extends EventEmitter<AgentServiceEvents> {
       mailbox,
       conversation: this.#conversation,
       hooks: {
+        emit: (event) => this.#emit(event),
         agent: (agentId) => store.list().find((agent) => agent.id === agentId),
         // Read late: the drain is built further down this constructor.
         hold: (agentId, taskId) => this.#drain.taskHold(agentId, taskId),
@@ -999,7 +1000,6 @@ export class AgentService extends EventEmitter<AgentServiceEvents> {
       memories: this.#memories,
       routines: this.#routines,
       hooks: {
-        emit: (event) => this.#emit(event),
         listAgents: () => this.listAgents(),
         deleteAgentData: (agent) => this.#removal.deleteData(agent).pipe(toAgentDuplicationFailed),
         hasAttentionFor: (agentId) => this.#attention.hasAttentionFor(agentId),
