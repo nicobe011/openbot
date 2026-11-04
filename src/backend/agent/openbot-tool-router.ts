@@ -3,7 +3,6 @@ import { chatVisualItemType } from "@openbot/contracts/chat-visual";
 import { sortConversationMessages } from "@openbot/contracts/conversation-order";
 import { INPUT_LIMITS } from "@openbot/contracts/input-limits";
 import type {
-  AgentEvent,
   AgentModelChoice,
   AgentModelOption,
   AgentSummary,
@@ -53,7 +52,6 @@ import {
   htmlRenderToolSchema,
   MARKETPLACE_APP_IDS,
   removeApiKeyToolSchema,
-  reportProgressToolSchema,
   requestApiKeyToolSchema,
   routineReportFailureToolSchema,
   saveApiKeyToolSchema,
@@ -179,7 +177,6 @@ function captureFailure(failure: ScreenCaptureFailed) {
 }
 
 export interface OpenBotToolRouterHooks {
-  emit(event: AgentEvent): void;
   listAgents(): AgentSummary[];
   listModels(): AgentModelOption[];
   /** The accounts of a signed-in provider, as the settings page lists them. */
@@ -539,30 +536,6 @@ export class OpenBotToolRouter {
             // Every provider gets ask_ui, Claude too: its call arrives here through the SDK MCP server.
             if (toolRequest.params.tool === "ask_ui") {
               this.#askUi(client, toolRequest, toolRequest.params);
-              return;
-            }
-            if (toolRequest.params.tool === "report_progress") {
-              const parsed = reportProgressToolSchema.safeParse(toolRequest.params.arguments);
-              if (!parsed.success) {
-                client.respond(
-                  toolRequest.id,
-                  openBotToolFailure(`${z.prettifyError(parsed.error)}\nCorrect the arguments and retry.`),
-                );
-                return;
-              }
-              const agentId = this.#conversation.agentForThread(toolRequest.params.threadId);
-              if (!agentId) {
-                client.respond(toolRequest.id, openBotToolFailure("This turn is not attached to an OpenBot agent."));
-                return;
-              }
-              this.#hooks.emit({
-                type: "turn-progress",
-                agentId,
-                threadId: this.#conversation.publicThreadId(agentId, toolRequest.params.threadId),
-                turnId: toolRequest.params.turnId,
-                detail: parsed.data.message,
-              });
-              client.respond(toolRequest.id, openBotToolResult({ status: "shown" }));
               return;
             }
             if (toolRequest.params.tool === "acknowledge_request") {
