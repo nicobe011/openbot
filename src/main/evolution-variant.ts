@@ -1,6 +1,6 @@
-import { isDynamicRecord } from "@openbot/contracts/runtime-values";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+import { isDynamicRecord } from "@openbot/contracts/runtime-values";
 import { app } from "electron";
 
 let cachedEvolutionBuild: boolean | undefined;
@@ -9,7 +9,7 @@ export function isEvolutionBuild(): boolean {
   if (!app.isPackaged) return false;
   if (cachedEvolutionBuild !== undefined) return cachedEvolutionBuild;
   try {
-    const metadata: unknown = JSON.parse(readFileSync(join(app.getAppPath(), "package.json"), "utf8"));
+    const metadata = JSON.parse(readFileSync(join(app.getAppPath(), "package.json"), "utf8"));
     cachedEvolutionBuild = isDynamicRecord(metadata) && metadata.openbotVariant === "evolution";
   } catch {
     cachedEvolutionBuild = false;
