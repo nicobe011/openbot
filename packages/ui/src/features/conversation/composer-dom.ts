@@ -80,6 +80,9 @@ function serializeNode(node: Node): string {
   const threadId = node.dataset.threadId;
   const threadName = node.dataset.threadName;
   if (threadId && threadName) return serializeChatTagReference("thread", threadName, threadId);
+  const surfaceId = node.dataset.surfaceId;
+  const surfaceName = node.dataset.surfaceName;
+  if (surfaceId && surfaceName) return serializeChatTagReference("surface", surfaceName, surfaceId);
   if (node.tagName === "BR") return "\n";
   const content = Array.from(node.childNodes).map(serializeNode).join("");
   return node.tagName === "DIV" || node.tagName === "P" ? `${content}\n` : content;
