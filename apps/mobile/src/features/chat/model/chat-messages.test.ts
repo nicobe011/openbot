@@ -64,4 +64,30 @@ describe("mobile parallel agents projection", () => {
     expect(rows.map((row) => row.kind)).toEqual(["subagents", "message"]);
     expect(rows[1]).toMatchObject({ kind: "message", body: "I finished the task." });
   });
+  it("shows committed memory changes as a structured mobile row", () => {
+    const memory: ConversationMessage = {
+      id: "memory-1",
+      turnId: "turn-1",
+      author: "system",
+      text: "1 memory saved",
+      itemType: "memory-changes",
+      status: "completed",
+      createdAt: "2026-11-04T12:01:02.000Z",
+      memoryChanges: [
+        {
+          memoryId: "memory-a",
+          action: "saved",
+          text: "The project uses one browser session per agent.",
+        },
+      ],
+    };
+    expect(projectChatMessages([memory])).toEqual([
+      {
+        id: "memory-1",
+        kind: "memory-changes",
+        changes: memory.memoryChanges,
+      },
+    ]);
+  });
+
 });
