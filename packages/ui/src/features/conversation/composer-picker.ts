@@ -28,7 +28,26 @@ export const COMPOSER_SURFACES: readonly ComposerSurface[] = [
   { id: "operations", name: "Operações", description: "Inspecione progresso, subagentes, tarefas, navegador e passos capturados" },
 ] as const;
 
+export interface ComposerCommand {
+  id: "teach" | "review" | "council" | "debug" | "goal" | "run" | "search" | "interrupt";
+  name: string;
+  description: string;
+  insertion: string;
+}
+
+export const COMPOSER_COMMANDS: readonly ComposerCommand[] = [
+  { id: "teach", name: "/teach", insertion: "/teach", description: "Aprender o fluxo recente e criar ou revisar uma skill" },
+  { id: "review", name: "/review", insertion: "/review", description: "Revisar o trabalho atual, validar o resultado e apontar falhas" },
+  { id: "council", name: "/council", insertion: "/council", description: "Pedir análises independentes a vários agentes e sintetizar a melhor resposta" },
+  { id: "debug", name: "/debug", insertion: "/debug", description: "Investigar a timeline, ferramentas, tentativas e a causa de uma falha" },
+  { id: "goal", name: "/goal", insertion: "/goal", description: "Definir ou atualizar um objetivo permanente do agente" },
+  { id: "run", name: "/run", insertion: "/run", description: "Executar uma skill, workflow ou rotina pelo nome" },
+  { id: "search", name: "/search", insertion: "/search", description: "Pesquisar contexto, histórico, memória, arquivos ou web conforme a solicitação" },
+  { id: "interrupt", name: "/interrupt", insertion: "/interrupt", description: "Interromper trabalho em andamento ou uma tarefa/subagente relacionado" },
+] as const;
+
 export type PickerOption =
+  | { type: "command"; command: ComposerCommand }
   | { type: "surface"; surface: ComposerSurface }
   | { type: "agent"; agent: ComposerAgent }
   /** Addresses every member of a channel. It inserts the text `@everyone`. */
@@ -53,6 +72,7 @@ export interface PickerSection {
 }
 
 export function pickerOptionKey(option: PickerOption): string {
+  if (option.type === "command") return `command:${option.command.id}`;
   if (option.type === "surface") return `surface:${option.surface.id}`;
   if (option.type === "agent") return `agent:${option.agent.id}`;
   if (option.type === "everyone") return "everyone";
@@ -63,6 +83,7 @@ export function pickerOptionKey(option: PickerOption): string {
 }
 
 export function pickerOptionText(option: PickerOption, t: TextValue["t"]): string {
+  if (option.type === "command") return option.command.name;
   if (option.type === "surface") return option.surface.name;
   if (option.type === "agent") return t("composer.picker.option.agent", { name: option.agent.name });
   if (option.type === "everyone") return t("composer.picker.everyone");
@@ -78,6 +99,7 @@ export function pickerOptionText(option: PickerOption, t: TextValue["t"]): strin
 }
 
 export function pickerOptionName(option: PickerOption, t: TextValue["t"]): string {
+  if (option.type === "command") return option.command.name;
   if (option.type === "surface") return option.surface.name;
   if (option.type === "agent") return option.agent.name;
   if (option.type === "everyone") return t("composer.picker.everyone");
@@ -92,6 +114,7 @@ export function pickerOptionDescription(
   t: TextValue["t"],
   format: TextValue["format"],
 ): string | undefined {
+  if (option.type === "command") return option.command.description;
   if (option.type === "surface") return option.surface.description;
   if (option.type === "everyone") return t("composer.picker.everyoneDescription");
   if (option.type === "attachment") return format.fileSize(option.attachment.size);
@@ -161,6 +184,7 @@ export function pickerOptionBadge(
   option: PickerOption,
   t: TextValue["t"],
 ): { label: string; icon?: typeof Puzzle } | null {
+  if (option.type === "command") return { label: "Comando" };
   if (option.type === "surface") return { label: "OpenBot" };
   // The section title says that a row is a tab, so a tab row needs no badge.
   if (option.type === "tab") return null;
