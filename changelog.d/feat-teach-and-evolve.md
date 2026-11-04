@@ -1,0 +1,2 @@
+- Add a managed Teach a Task skill that turns recent captured work steps into versioned local skills.
+- Document the learning-by-demonstration architecture and safe evolution loop.
