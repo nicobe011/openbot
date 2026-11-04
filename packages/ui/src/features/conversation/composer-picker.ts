@@ -16,7 +16,20 @@ export interface PickerFrame {
   bottom: number;
 }
 
+export interface ComposerSurface { id: "browser" | "computer" | "files" | "memory" | "workflows" | "teach" | "operations"; name: string; description: string; }
+
+export const COMPOSER_SURFACES: readonly ComposerSurface[] = [
+  { id: "browser", name: "Navegador", description: "Use o navegador isolado deste agente e suas abas persistentes" },
+  { id: "computer", name: "Computador", description: "Use o computador, terminal e ambiente de execução deste agente" },
+  { id: "files", name: "Arquivos", description: "Trabalhe com arquivos e pastas do workspace deste agente" },
+  { id: "memory", name: "Memória", description: "Consulte ou atualize a memória persistente do agente" },
+  { id: "workflows", name: "Workflows", description: "Crie, leia, execute ou depure workflows e rotinas" },
+  { id: "teach", name: "Teach", description: "Aprenda uma tarefa recente e transforme-a em skill reutilizável" },
+  { id: "operations", name: "Operações", description: "Inspecione progresso, subagentes, tarefas, navegador e passos capturados" },
+] as const;
+
 export type PickerOption =
+  | { type: "surface"; surface: ComposerSurface }
   | { type: "agent"; agent: ComposerAgent }
   /** Addresses every member of a channel. It inserts the text `@everyone`. */
   | { type: "everyone" }
@@ -40,6 +53,7 @@ export interface PickerSection {
 }
 
 export function pickerOptionKey(option: PickerOption): string {
+  if (option.type === "surface") return `surface:${option.surface.id}`;
   if (option.type === "agent") return `agent:${option.agent.id}`;
   if (option.type === "everyone") return "everyone";
   if (option.type === "skill") return `skill:${option.skill.skillId}`;
@@ -49,6 +63,7 @@ export function pickerOptionKey(option: PickerOption): string {
 }
 
 export function pickerOptionText(option: PickerOption, t: TextValue["t"]): string {
+  if (option.type === "surface") return option.surface.name;
   if (option.type === "agent") return t("composer.picker.option.agent", { name: option.agent.name });
   if (option.type === "everyone") return t("composer.picker.everyone");
   if (option.type === "skill") {
@@ -63,6 +78,7 @@ export function pickerOptionText(option: PickerOption, t: TextValue["t"]): strin
 }
 
 export function pickerOptionName(option: PickerOption, t: TextValue["t"]): string {
+  if (option.type === "surface") return option.surface.name;
   if (option.type === "agent") return option.agent.name;
   if (option.type === "everyone") return t("composer.picker.everyone");
   if (option.type === "skill") return option.skill.name;
@@ -76,6 +92,7 @@ export function pickerOptionDescription(
   t: TextValue["t"],
   format: TextValue["format"],
 ): string | undefined {
+  if (option.type === "surface") return option.surface.description;
   if (option.type === "everyone") return t("composer.picker.everyoneDescription");
   if (option.type === "attachment") return format.fileSize(option.attachment.size);
   if (option.type === "skill") return skillDescription(option.skill);
@@ -144,6 +161,7 @@ export function pickerOptionBadge(
   option: PickerOption,
   t: TextValue["t"],
 ): { label: string; icon?: typeof Puzzle } | null {
+  if (option.type === "surface") return { label: "OpenBot" };
   // The section title says that a row is a tab, so a tab row needs no badge.
   if (option.type === "tab") return null;
   if (option.type === "thread") return { label: t(THREAD_STATE_LABELS[threadStateLabel(option.thread)]) };
