@@ -114,6 +114,17 @@ try {
   const clientA = await runCauseEffect(host.profiles.create("Client A"));
   const clientB = await runCauseEffect(host.profiles.create("Client B"));
 
+  pass(
+    "new agents start in isolated browser sessions",
+    host.profiles.readAgent(first.id).kind === "agent" &&
+      host.profiles.readAgent(second.id).kind === "agent" &&
+      host.profiles.readAgent(third.id).kind === "agent" &&
+      !host.profiles.list().sharedAgentIds.includes(first.id) &&
+      !host.profiles.list().sharedAgentIds.includes(second.id) &&
+      !host.profiles.list().sharedAgentIds.includes(third.id),
+    host.profiles.list(),
+  );
+
   await choose(host, first.id, { kind: "profile", profileId: clientA.id });
   await choose(host, second.id, { kind: "profile", profileId: clientA.id });
   await choose(host, third.id, { kind: "profile", profileId: clientB.id });
