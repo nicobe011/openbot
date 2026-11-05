@@ -16,7 +16,118 @@ export interface PickerFrame {
   bottom: number;
 }
 
+export interface ComposerSurface {
+  id: "browser" | "computer" | "files" | "memory" | "workflows" | "teach" | "operations";
+  name: string;
+  description: string;
+}
+
+export const COMPOSER_SURFACES: readonly ComposerSurface[] = [
+  {
+    id: "browser",
+    name: "Navegador",
+    description: "Use o navegador isolado deste agente e suas abas persistentes",
+  },
+  {
+    id: "computer",
+    name: "Computador",
+    description: "Use o computador, terminal e ambiente de execução deste agente",
+  },
+  {
+    id: "files",
+    name: "Arquivos",
+    description: "Trabalhe com arquivos e pastas do workspace deste agente",
+  },
+  {
+    id: "memory",
+    name: "Memória",
+    description: "Consulte ou atualize a memória persistente do agente",
+  },
+  {
+    id: "workflows",
+    name: "Workflows",
+    description: "Crie, leia, execute ou depure workflows e rotinas",
+  },
+  {
+    id: "teach",
+    name: "Teach",
+    description: "Aprenda uma tarefa recente e transforme-a em skill reutilizável",
+  },
+  {
+    id: "operations",
+    name: "Operações",
+    description: "Inspecione progresso, subagentes, tarefas, navegador e passos capturados",
+  },
+] as const;
+
+export interface ComposerCommand {
+  id: "teach" | "review" | "council" | "debug" | "goal" | "run" | "search" | "interrupt";
+  name: string;
+  description: string;
+  insertion: string;
+}
+
+export const COMPOSER_COMMANDS: readonly ComposerCommand[] = [
+  {
+    id: "teach",
+    name: "/teach",
+    insertion:
+      "/teach Use the Teach a Task skill to learn the recent demonstrated or corrected workflow and create or revise a reusable skill.",
+    description: "Aprender o fluxo recente e criar ou revisar uma skill",
+  },
+  {
+    id: "review",
+    name: "/review",
+    insertion:
+      "/review Independently verify the current result, check its success condition, and report concrete defects before considering it done.",
+    description: "Revisar o trabalho atual, validar o resultado e apontar falhas",
+  },
+  {
+    id: "council",
+    name: "/council",
+    insertion:
+      "/council Ask up to three suitable agents for independent analyses in parallel, then synthesize the strongest result and note meaningful disagreement.",
+    description: "Pedir análises independentes a vários agentes e sintetizar a melhor resposta",
+  },
+  {
+    id: "debug",
+    name: "/debug",
+    insertion:
+      "/debug Inspect relevant history, captured work steps, turn traces, browser state, tasks and subagent outcomes to locate the failure before changing anything.",
+    description: "Investigar a timeline, ferramentas, tentativas e a causa de uma falha",
+  },
+  {
+    id: "goal",
+    name: "/goal",
+    insertion:
+      "/goal Update the concise Standing goals section in this agent's AGENTS.md as requested so this goal persists.",
+    description: "Definir ou atualizar um objetivo permanente do agente",
+  },
+  {
+    id: "run",
+    name: "/run",
+    insertion: "/run Resolve the named skill, workflow or routine and execute the matching one.",
+    description: "Executar uma skill, workflow ou rotina pelo nome",
+  },
+  {
+    id: "search",
+    name: "/search",
+    insertion:
+      "/search Search the most relevant available history, memories, workspace files and web or tools for the request.",
+    description: "Pesquisar contexto, histórico, memória, arquivos ou web conforme a solicitação",
+  },
+  {
+    id: "interrupt",
+    name: "/interrupt",
+    insertion:
+      "/interrupt Stop related delegated work that this agent is allowed to interrupt and report what may still be running.",
+    description: "Interromper trabalho em andamento ou uma tarefa/subagente relacionado",
+  },
+] as const;
+
 export type PickerOption =
+  | { type: "command"; command: ComposerCommand }
+  | { type: "surface"; surface: ComposerSurface }
   | { type: "agent"; agent: ComposerAgent }
   /** Addresses every member of a channel. It inserts the text `@everyone`. */
   | { type: "everyone" }
@@ -40,6 +151,8 @@ export interface PickerSection {
 }
 
 export function pickerOptionKey(option: PickerOption): string {
+  if (option.type === "command") return `command:${option.command.id}`;
+  if (option.type === "surface") return `surface:${option.surface.id}`;
   if (option.type === "agent") return `agent:${option.agent.id}`;
   if (option.type === "everyone") return "everyone";
   if (option.type === "skill") return `skill:${option.skill.skillId}`;
@@ -49,6 +162,8 @@ export function pickerOptionKey(option: PickerOption): string {
 }
 
 export function pickerOptionText(option: PickerOption, t: TextValue["t"]): string {
+  if (option.type === "command") return option.command.name;
+  if (option.type === "surface") return option.surface.name;
   if (option.type === "agent") return t("composer.picker.option.agent", { name: option.agent.name });
   if (option.type === "everyone") return t("composer.picker.everyone");
   if (option.type === "skill") {
@@ -63,6 +178,8 @@ export function pickerOptionText(option: PickerOption, t: TextValue["t"]): strin
 }
 
 export function pickerOptionName(option: PickerOption, t: TextValue["t"]): string {
+  if (option.type === "command") return option.command.name;
+  if (option.type === "surface") return option.surface.name;
   if (option.type === "agent") return option.agent.name;
   if (option.type === "everyone") return t("composer.picker.everyone");
   if (option.type === "skill") return option.skill.name;
@@ -76,6 +193,8 @@ export function pickerOptionDescription(
   t: TextValue["t"],
   format: TextValue["format"],
 ): string | undefined {
+  if (option.type === "command") return option.command.description;
+  if (option.type === "surface") return option.surface.description;
   if (option.type === "everyone") return t("composer.picker.everyoneDescription");
   if (option.type === "attachment") return format.fileSize(option.attachment.size);
   if (option.type === "skill") return skillDescription(option.skill);
@@ -144,6 +263,8 @@ export function pickerOptionBadge(
   option: PickerOption,
   t: TextValue["t"],
 ): { label: string; icon?: typeof Puzzle } | null {
+  if (option.type === "command") return { label: "Comando" };
+  if (option.type === "surface") return { label: "OpenBot" };
   // The section title says that a row is a tab, so a tab row needs no badge.
   if (option.type === "tab") return null;
   if (option.type === "thread") return { label: t(THREAD_STATE_LABELS[threadStateLabel(option.thread)]) };

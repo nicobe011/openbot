@@ -554,6 +554,15 @@ export function ConversationTimeline() {
     lines: () => props.turnStepLines,
     activeTurnId: () => props.activeTurnId,
   });
+  const activeSubagents = createMemo(() => {
+    const turnId = props.activeTurnId;
+    if (!turnId) return undefined;
+    for (let index = props.messages.length - 1; index >= 0; index -= 1) {
+      const message = props.messages[index];
+      if (message?.turnId === turnId && message.kind === "subagents") return message.subagents;
+    }
+    return undefined;
+  });
   const showAgentSteps = useShowAgentSteps();
   const traceKeyboard = currentDevicePlatform() === "darwin" ? "mac" : "pc";
   /** The trace that the steps row of an answer opens. A channel names the agent that answered. */
@@ -1042,6 +1051,10 @@ export function ConversationTimeline() {
                 if (untrack(() => initialMessage.kind === "subagents")) {
                   // The subagents have no bubble, reactions or time: they are the live work of the turn.
                   const subagents = () => message()?.subagents ?? initialMessage.subagents;
+                  const belongsToActiveTurn = () => {
+                    const current = message() ?? initialMessage;
+                    return current.turnId !== undefined && current.turnId === props.activeTurnId;
+                  };
                   return (
                     <div
                       data-index={virtualRow.index}
@@ -1072,22 +1085,24 @@ export function ConversationTimeline() {
                           }}
                         />
                       </Show>
-                      <ChatRowBoundary>
-                        <article
-                          data-chat-search-message={message()?.id}
-                          class={{ "message-entry-animated": animateEntrance }}
-                        >
-                          <Show when={subagents()}>
-                            {(current) => (
-                              <SubagentGroup
-                                subagents={current()}
-                                selectedId={shownSubagentId()}
-                                onOpen={toggleSubagentPanel}
-                              />
-                            )}
-                          </Show>
-                        </article>
-                      </ChatRowBoundary>
+                      <Show when={!belongsToActiveTurn()}>
+                        <ChatRowBoundary>
+                          <article
+                            data-chat-search-message={message()?.id}
+                            class={{ "message-entry-animated": animateEntrance }}
+                          >
+                            <Show when={subagents()}>
+                              {(current) => (
+                                <SubagentGroup
+                                  subagents={current()}
+                                  selectedId={shownSubagentId()}
+                                  onOpen={toggleSubagentPanel}
+                                />
+                              )}
+                            </Show>
+                          </article>
+                        </ChatRowBoundary>
+                      </Show>
                     </div>
                   );
                 }
@@ -1502,6 +1517,9 @@ export function ConversationTimeline() {
                       since={activity().since}
                       steps={turnSteps.activeSteps()}
                       stepsOpenByDefault={showAgentSteps()}
+                      subagents={activeSubagents()}
+                      selectedSubagentId={shownSubagentId()}
+                      onOpenSubagent={toggleSubagentPanel}
                       waitingFor={waitingProviderName()}
                     />
                   )}

@@ -46,6 +46,7 @@ import {
   readDevelopmentRemoteDebuggingPort,
   shouldAutoStartHost,
 } from "./development-profile";
+import { configureEvolutionIdentity } from "./evolution-variant";
 import { stopStuckExitAfterLimit } from "./exit-watchdog";
 import { filePreviewPages } from "./file-preview-pages";
 import { hostAllowsTenantLaunch } from "./host-update-coordinator";
@@ -269,9 +270,12 @@ if (commandLineUserDataDirectory) {
     ),
   );
 }
-app.setName("OpenBot");
+const evolutionBuild = configureEvolutionIdentity();
+if (!evolutionBuild) {
+  app.setName("OpenBot");
+  if (process.platform === "win32") app.setAppUserModelId("app.openbot.desktop");
+}
 app.enableSandbox();
-if (process.platform === "win32") app.setAppUserModelId("app.openbot.desktop");
 // Linux: on Wayland, Chromium waits until a monitor is on before it starts. With none, start again on
 // XWayland. Before the single-instance lock, so that the new process can take it. A parent process or
 // systemd watches the process, the output and the input of a headless server, so it does not restart.
@@ -966,8 +970,9 @@ async function presentApplication(): Promise<void> {
     process.platform === "linux" ||
     ((process.platform === "darwin" || process.platform === "win32") && app.isPackaged)
   ) {
-    if (!app.setAsDefaultProtocolClient("openbot")) {
-      logger.warn("Unable to register the openbot:// scheme. Invitation links will not open OpenBot.");
+    const scheme = evolutionBuild ? "openbot-evolution" : "openbot";
+    if (!app.setAsDefaultProtocolClient(scheme)) {
+      logger.warn(`Unable to register the ${scheme}:// scheme. Invitation links will not open this application.`);
     }
   }
 }

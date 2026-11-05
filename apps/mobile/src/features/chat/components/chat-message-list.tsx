@@ -57,8 +57,10 @@ import { ChatActivityRow, type ChatActivitySpec } from "@/features/chat/componen
 import { type ApprovalDecision, approvalTitle, ChatApprovalCard } from "@/features/chat/components/chat-approval-card";
 import { ChatExchangeGroup, ChatExchangeMarker } from "@/features/chat/components/chat-exchange-marker";
 import { ChatMarkdown } from "@/features/chat/components/chat-markdown";
+import { ChatMemoryChanges } from "@/features/chat/components/chat-memory-changes";
 import { ChatPlan } from "@/features/chat/components/chat-plan";
 import { ChatQuestionPrompt } from "@/features/chat/components/chat-question-prompt";
+import { ChatSubagents } from "@/features/chat/components/chat-subagents";
 import { ChatTurnStepsRow } from "@/features/chat/components/chat-turn-steps-row";
 import { useActivityPresence } from "@/features/chat/components/use-activity-presence";
 import { CHAT_ROW_GAP, type ChatMotion } from "@/features/chat/components/use-chat-motion";
@@ -649,6 +651,10 @@ const MessageRow = memo(function MessageRow({
       <ChatExchangeMarker key={message.id} message={message} agents={agents} agentsById={agentsById} muted={muted} />
     ) : message.kind === "plan" ? (
       <ChatPlan key={message.id} message={message} />
+    ) : message.kind === "memory-changes" ? (
+      <ChatMemoryChanges key={message.id} message={message} />
+    ) : message.kind === "subagents" ? (
+      <ChatSubagents key={message.id} message={message} />
     ) : message.kind === "question" ? (
       <ChatQuestionPrompt
         key={message.id}

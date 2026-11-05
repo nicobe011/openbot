@@ -23,6 +23,7 @@ import {
   TriangleAlert,
   X,
 } from "@openbot/ui";
+import { AgentAvatar } from "@openbot/ui/features/agents/AgentAvatar";
 import { useText } from "@openbot/ui/text";
 import { prefersReducedMotion } from "@openbot/ui/utils";
 import type { JSX } from "@solidjs/web";
@@ -37,6 +38,35 @@ const STATE_LABEL = {
 
 /** The Claude type of a subagent with no special role. The meta line does not name it. */
 const GENERAL_AGENT_TYPE = "general-purpose";
+
+/** A compact portrait of the parallel workers. We reuse the existing avatar engine
+ * rather than shipping a second character or animation system. */
+function SubagentFaces(props: { subagents: readonly ConversationSubagent[] }) {
+  return (
+    <span class="subagents-faces" aria-hidden="true">
+      <For each={props.subagents.slice(0, 4)} keyed={(subagent) => subagent.id}>
+        {(subagent) => (
+          <AgentAvatar
+            seed={subagent().id}
+            hue={null}
+            class="subagents-face"
+            motion={subagent().status === "running" ? "always" : "idle"}
+            transition="cut"
+            mood={
+              subagent().status === "running"
+                ? "working"
+                : subagent().status === "completed"
+                  ? "responded"
+                  : subagent().status === "failed"
+                    ? "failed"
+                    : "asleep"
+            }
+          />
+        )}
+      </For>
+    </span>
+  );
+}
 
 /** The time now, once a second while `running` is true. */
 function createClock(running: () => boolean) {
@@ -221,6 +251,7 @@ export function SubagentGroup(props: SubagentGroupProps) {
         aria-controls={expanded() ? listId : undefined}
         onClick={() => setChoice(!expanded())}
       >
+        <SubagentFaces subagents={props.subagents} />
         <span class="subagents-group-title">
           {running() > 0
             ? t("chat.subagents.running", { count: total() })
@@ -365,6 +396,7 @@ export function SubagentDock(props: SubagentDockProps) {
               class="subagents-dock-bar no-drag"
               onClick={() => props.onReveal()}
             >
+              <SubagentFaces subagents={subagents()} />
               <span class="subagents-group-title">{t("chat.subagents.running", { count: progress.total() })}</span>
               <RunningProgress finished={progress.finished()} total={progress.total()} />
               <span class="subagents-dock-live">

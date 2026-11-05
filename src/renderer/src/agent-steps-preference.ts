@@ -6,16 +6,16 @@ const SHOW_AGENT_STEPS_STORAGE_KEY = "openbot:show-agent-steps";
 let unsavedPreference: boolean | undefined;
 
 /**
- * Whether the steps of a turn are open at first, on this device and browser. They are closed unless
+ * Whether the steps of a turn are open at first, on this device and browser. They are open unless
  * the user chose otherwise. Reading `window.localStorage` throws when the browser blocks storage, so
  * it is read inside the guard.
  */
 export function readShowAgentSteps(): boolean {
   if (unsavedPreference !== undefined) return unsavedPreference;
   try {
-    return window.localStorage.getItem(SHOW_AGENT_STEPS_STORAGE_KEY) === "true";
+    return window.localStorage.getItem(SHOW_AGENT_STEPS_STORAGE_KEY) !== "false";
   } catch {
-    return false;
+    return true;
   }
 }
 

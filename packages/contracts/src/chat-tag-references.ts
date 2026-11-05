@@ -11,7 +11,7 @@
  * the name. Message bodies are stored as written, so an older app reading a newer message is a
  * real case, and it stays readable.
  */
-export type ChatTagKind = "agent" | "skill" | "mcp" | "quote" | "tab" | "thread";
+export type ChatTagKind = "agent" | "skill" | "mcp" | "quote" | "tab" | "thread" | "surface";
 
 export interface ChatTagReference {
   kind: ChatTagKind;
@@ -21,7 +21,8 @@ export interface ChatTagReference {
   end: number;
 }
 
-const CHAT_TAG_REFERENCE_PATTERN = /@\[([^\]\r\n]+)\]\((agent|skill|mcp|quote|tab|thread)(\+uri)?:([^)\r\n]+)\)/gu;
+const CHAT_TAG_REFERENCE_PATTERN =
+  /@\[([^\]\r\n]+)\]\((agent|skill|mcp|quote|tab|thread|surface)(\+uri)?:([^)\r\n]+)\)/gu;
 
 /*
  * Quoted text is any text, and Markdown reads the marker as a link. A bracket, a backslash, a
@@ -123,7 +124,15 @@ export function leadingAddress(value: string): { mentions: ChatTagReference[]; e
 }
 
 function chatTagKind(value: string | undefined): ChatTagKind {
-  if (value === "skill" || value === "mcp" || value === "quote" || value === "tab" || value === "thread") return value;
+  if (
+    value === "skill" ||
+    value === "mcp" ||
+    value === "quote" ||
+    value === "tab" ||
+    value === "thread" ||
+    value === "surface"
+  )
+    return value;
   return "agent";
 }
 
@@ -162,6 +171,7 @@ export function expandChatTagReferences(
         return expanded;
       }
       if (kind === "tab" || kind === "thread") return resolveName?.(reference) ?? name;
+      if (kind === "surface") return expandedSurfaceTag(id, resolveName?.(reference) ?? name);
       const resolvedName = resolveName?.(reference) ?? name;
       return expandedChatTag(kind, resolvedName);
     },
@@ -205,6 +215,25 @@ function fileQuoteHeading(file: FileQuoteTarget): string {
 }
 
 /** What the provider reads in place of a marker. A name alone would not say what it names. */
+function expandedSurfaceTag(id: string, name: string): string {
+  const instruction: Record<string, string> = {
+    browser:
+      "Use this agent's isolated persistent OpenBot browser. Prefer existing tabs and saved sign-ins before opening a new tab.",
+    computer:
+      "Use this agent's Computer Use environment and terminal/workspace tools when the task needs desktop interaction or execution.",
+    files:
+      "Work with this agent's workspace and allowed files. Prefer direct file tools over browser uploads when possible.",
+    memory:
+      "Use the agent's persistent memories as context and update them only when the user asks or the memory rules allow it.",
+    workflows: "Use OpenBot workflows, routines and their run/debug tools for this request.",
+    teach:
+      "Treat the recent successful or corrected work as a demonstration. Use the Teach a Task skill to create or revise a reusable skill.",
+    operations:
+      "Inspect the task timeline, captured work steps, subagents, browser activity and progress before diagnosing or reporting status.",
+  };
+  return `${name} (OpenBot surface). ${instruction[id] ?? "Use the matching OpenBot tools for this surface."}`;
+}
+
 function expandedChatTag(kind: "agent" | "skill" | "mcp", name: string): string {
   if (kind === "agent") return `@${name}`;
   return kind === "mcp" ? `${name} (MCP server)` : `${name} (skill)`;

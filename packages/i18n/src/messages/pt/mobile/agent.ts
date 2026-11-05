@@ -383,11 +383,11 @@ export const messages = {
   "mobile.agent.browserProfile.new": "Novo perfil",
   "mobile.agent.browserProfile.manage": "Gerenciar perfis",
   "mobile.agent.browserProfile.footer":
-    "Cada perfil guarda seus próprios logins e cookies. Uma alteração fecha as abas abertas do agente.",
+    "Os agentes começam com logins e cookies próprios. Compartilhado faz os agentes usarem a mesma sessão do navegador. Uma alteração fecha as abas abertas do agente.",
   "mobile.agent.browserProfile.saveFailed": "O OpenBot não conseguiu alterar o perfil do navegador do agente.",
   "mobile.agent.planCard.label": "Mostrar o plano antes de tarefas longas",
   "mobile.agent.planCard.footer":
-    "Antes de uma tarefa longa, o agente mostra o plano. Ele começa após 10 s ou quando você toca em Iniciar.",
+    "Antes de uma tarefa longa, o agente mostra o plano e publica atualizações curtas quando o trabalho muda de etapa. Ele começa após 10 s ou quando você toca em Iniciar.",
   "mobile.agent.workspace.title": "Pasta do espaço de trabalho",
   "mobile.agent.workspace.footer": "A pasta deste agente no computador anfitrião.",
   "mobile.agent.notifications.failed": "Não foi possível alterar as notificações",

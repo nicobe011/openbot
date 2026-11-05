@@ -5,16 +5,19 @@ import type {
   AttachmentSummary,
   ChannelMessage,
   ChannelRoutingConversationEvent,
+  ConversationMemoryChange,
   ConversationMessage,
   ConversationMessageSender,
   ConversationQuestionPrompt,
   ConversationReaction,
+  ConversationSubagent,
   ImageGenerationInfo,
   QueueDelivery,
   RoutineConversationEventAction,
   RoutineRunStatus,
 } from "@openbot/contracts/ipc";
 import {
+  CONVERSATION_MEMORY_CHANGES_ITEM_TYPE,
   CONVERSATION_PLAN_ITEM_TYPE,
   CONVERSATION_SUBAGENTS_ITEM_TYPE,
   channelRoutingConversationEvent,
@@ -90,7 +93,17 @@ export type ChatMessage =
       /** The reactions on the message: the reader's own and the agents'. */
       reactions?: readonly ConversationReaction[];
     }
+  | {
+      id: string;
+      kind: "memory-changes";
+      changes: readonly ConversationMemoryChange[];
+    }
   /** The task list of an agent plan. The header is `heading` when set, else a catalog title. */
+  | {
+      id: string;
+      kind: "subagents";
+      subagents: readonly ConversationSubagent[];
+    }
   | {
       id: string;
       kind: "plan";
@@ -373,6 +386,18 @@ export function projectChatMessages(
           uiBlock: message.uiBlock,
         })),
       );
+      continue;
+    }
+    if (message.itemType === CONVERSATION_MEMORY_CHANGES_ITEM_TYPE && message.memoryChanges?.length) {
+      result.push({ id: message.id, kind: "memory-changes", changes: message.memoryChanges });
+      continue;
+    }
+    // The mobile list uses the same typed subagent snapshot as desktop; these are
+    // independent parallel workers, not an assistant text bubble.
+    if (message.author === "assistant" && message.itemType === CONVERSATION_SUBAGENTS_ITEM_TYPE) {
+      if (message.subagents?.length) {
+        result.push({ id: message.id, kind: "subagents", subagents: message.subagents });
+      }
       continue;
     }
     // A generation has no text or attachment until its image arrives, and it still needs its placeholder.

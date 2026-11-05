@@ -42,6 +42,8 @@ import {
 } from "./composer-dom";
 import { shouldRestoreComposerFocus } from "./composer-focus";
 import {
+  COMPOSER_COMMANDS,
+  COMPOSER_SURFACES,
   measurePickerFrame,
   type PickerFrame,
   type PickerOption,
@@ -61,6 +63,7 @@ import {
   createMentionToken,
   createQuoteToken,
   createSkillToken,
+  createSurfaceToken,
   createTabToken,
   createThreadToken,
   type EditorTagSources,
@@ -168,7 +171,7 @@ interface MentionContext {
   query: string;
   start: number;
   end: number;
-  trigger: "@" | "$";
+  trigger: "@" | "$" | "/";
 }
 
 const DICTATION_INTERIM_WORDS = 2;
@@ -250,6 +253,26 @@ export function ComposerEditor(props: ComposerEditorProps) {
       (server) => server.enabled && (!query || server.name.toLocaleLowerCase().includes(query)),
     );
   });
+  const matchingSurfaces = createMemo(() => {
+    const query = mention()?.query.trim().toLocaleLowerCase() ?? "";
+    return COMPOSER_SURFACES.filter(
+      (surface) =>
+        !query ||
+        surface.name.toLocaleLowerCase().includes(query) ||
+        surface.id.toLocaleLowerCase().includes(query) ||
+        surface.description.toLocaleLowerCase().includes(query),
+    );
+  });
+  const matchingCommands = createMemo(() => {
+    const query = mention()?.query.trim().toLocaleLowerCase() ?? "";
+    return COMPOSER_COMMANDS.filter(
+      (command) =>
+        !query ||
+        command.id.startsWith(query) ||
+        command.name.slice(1).toLocaleLowerCase().startsWith(query) ||
+        command.description.toLocaleLowerCase().includes(query),
+    );
+  });
   const browserTabs = () => props.browserTabs ?? EMPTY_TABS;
   const threads = () => props.threads ?? EMPTY_THREADS;
   const matchingTabs = createMemo(() => {
@@ -267,6 +290,14 @@ export function ComposerEditor(props: ComposerEditorProps) {
   const pickerSections = createMemo<PickerSection[]>(() => {
     const trigger = mention()?.trigger;
     /* Skills first: a skill is what the user writes with, and a server is what one of them reaches. */
+    if (trigger === "/")
+      return [
+        {
+          id: "commands",
+          title: null,
+          options: matchingCommands().map((command) => ({ type: "command" as const, command })),
+        },
+      ].filter((section) => section.options.length > 0);
     if (trigger === "$")
       return [
         {
@@ -280,6 +311,11 @@ export function ComposerEditor(props: ComposerEditorProps) {
       ].filter((section) => section.options.length > 0);
     if (trigger !== "@") return [];
     const sections: PickerSection[] = [
+      {
+        id: "surfaces",
+        title: null,
+        options: matchingSurfaces().map((surface) => ({ type: "surface" as const, surface })),
+      },
       {
         id: "agents",
         title: "composer.picker.section.agents",
@@ -650,9 +686,9 @@ export function ComposerEditor(props: ComposerEditorProps) {
     const selection = readEditorSelection(editor);
     if (!selection || selection.anchor !== selection.focus) return null;
     const beforeCaret = editorText(editor).slice(0, selection.focus);
-    const match = beforeCaret.match(/(?:^|\s)([@$])([^@$\n\uFFFC]{0,60})$/u);
+    const match = beforeCaret.match(/(?:^|\s)([@$/])([^@$/\n\uFFFC]{0,60})$/u);
     if (!match) return null;
-    const trigger = match[1] === "$" ? "$" : "@";
+    const trigger = match[1] === "$" ? "$" : match[1] === "/" ? "/" : "@";
     const query = match[2] ?? "";
     return { query, start: beforeCaret.length - query.length - 1, end: beforeCaret.length, trigger };
   }
@@ -698,20 +734,37 @@ export function ComposerEditor(props: ComposerEditorProps) {
     const range = rangeFromTextOffsets(editor, context.start, context.end);
     if (!range) return;
     range.deleteContents();
+    if (option.type === "command") {
+      const command = document.createTextNode(option.command.insertion);
+      const trailingSpace = document.createTextNode(" ");
+      range.insertNode(trailingSpace);
+      range.insertNode(command);
+      const selection = window.getSelection();
+      range.setStartAfter(trailingSpace);
+      range.collapse(true);
+      selection?.removeAllRanges();
+      selection?.addRange(range);
+      setMention(null);
+      emitValue();
+      editor.focus();
+      return;
+    }
     const token =
-      option.type === "agent"
-        ? createMentionToken(option.agent)
-        : option.type === "everyone"
-          ? document.createTextNode(EVERYONE_MENTION)
-          : option.type === "skill"
-            ? createSkillToken(option.skill)
-            : option.type === "mcp"
-              ? createMcpToken(option.server)
-              : option.type === "tab"
-                ? createTabToken(option.tab)
-                : option.type === "thread"
-                  ? createThreadToken(option.thread)
-                  : createAttachmentToken(option.attachment, attachmentTokenActions);
+      option.type === "surface"
+        ? createSurfaceToken(option.surface)
+        : option.type === "agent"
+          ? createMentionToken(option.agent)
+          : option.type === "everyone"
+            ? document.createTextNode(EVERYONE_MENTION)
+            : option.type === "skill"
+              ? createSkillToken(option.skill)
+              : option.type === "mcp"
+                ? createMcpToken(option.server)
+                : option.type === "tab"
+                  ? createTabToken(option.tab)
+                  : option.type === "thread"
+                    ? createThreadToken(option.thread)
+                    : createAttachmentToken(option.attachment, attachmentTokenActions);
     const trailingSpace = document.createTextNode(" ");
     range.insertNode(trailingSpace);
     range.insertNode(token);
@@ -1187,7 +1240,11 @@ export function ComposerEditor(props: ComposerEditorProps) {
                         setActiveOption(optionIndex());
                       }}
                     >
-                      {option.type === "agent" ? (
+                      {option.type === "command" || option.type === "surface" ? (
+                        <span class="mention-picker-skill-icon" aria-hidden="true">
+                          <Blocks />
+                        </span>
+                      ) : option.type === "agent" ? (
                         <AgentAvatar agent={option.agent} />
                       ) : option.type === "everyone" ? (
                         <span class="mention-picker-skill-icon" aria-hidden="true">

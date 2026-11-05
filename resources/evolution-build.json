@@ -1,0 +1,7 @@
+{
+  "variant": "evolution",
+  "productName": "OpenBot Evolution",
+  "appId": "app.openbot.evolution.desktop",
+  "dataDirectory": "OpenBot Evolution",
+  "updates": false
+}

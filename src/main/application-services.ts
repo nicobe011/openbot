@@ -203,6 +203,7 @@ import {
 } from "./development-remote-bootstrap";
 import { performDynamicIslandCriticalAction } from "./dynamic-island-actions";
 import { DynamicIslandFailed, DynamicIslandWindowController, toDynamicIslandFailed } from "./dynamic-island-window";
+import { isEvolutionBuild } from "./evolution-variant";
 import {
   createExternalLinkPreferenceStore,
   ExternalLinkOpener,
@@ -263,7 +264,12 @@ import {
   sendComputerUseHighlightPlacement,
   showMainWindow,
 } from "./main-window";
-import { DATA_SKILL_SLUG, ManagedSkillService, SKILL_CREATOR_SKILL_SLUG } from "./managed-skill-service";
+import {
+  DATA_SKILL_SLUG,
+  ManagedSkillService,
+  SKILL_CREATOR_SKILL_SLUG,
+  TEACH_TASK_SKILL_SLUG,
+} from "./managed-skill-service";
 import { McpHostSignIns } from "./mcp-host-sign-ins";
 import { McpOAuthProxySettingsFile } from "./mcp-oauth-proxy-store";
 import {
@@ -1096,7 +1102,7 @@ export async function createApplicationServices({
     homedir(),
     new OpenBotDatabase(app.getPath("userData")),
     () => agentDefaults.get(),
-    localServerChild?.agentRoot,
+    localServerChild?.agentRoot ?? (isEvolutionBuild() ? join(homedir(), "OpenBot Evolution") : undefined),
   );
   // Phase marks for `dev:bench`, so a slow start shows which group of awaits it waited on. They
   // change nothing.
@@ -1127,9 +1133,18 @@ export async function createApplicationServices({
     undefined,
     DATA_SKILL_SLUG,
   );
+  const teachTaskSkill = new ManagedSkillService(
+    app.isPackaged
+      ? join(process.resourcesPath, "managed-skills", "openbot-teach-task", "SKILL.md")
+      : resolve(__dirname, "../../resources/managed-skills/openbot-teach-task/SKILL.md"),
+    undefined,
+    undefined,
+    TEACH_TASK_SKILL_SLUG,
+  );
   await Effect.runPromise(managedSkills.syncAll(store.list()));
   await Effect.runPromise(skillCreator.syncAll(store.list()));
   await Effect.runPromise(dataSkill.syncAll(store.list()));
+  await Effect.runPromise(teachTaskSkill.syncAll(store.list()));
   performance.mark("openbot:services.skills");
   const hostedSites = new HostedSiteDesktopService(centralAuth, () => {
     // Read at request time: the team store is created later, and the server can register after launch.
@@ -1832,6 +1847,7 @@ export async function createApplicationServices({
         yield* managedSkills.syncAgent(agent);
         yield* skillCreator.syncAgent(agent);
         yield* dataSkill.syncAgent(agent);
+        yield* teachTaskSkill.syncAgent(agent);
       }),
     hostedSites: {
       list: () => hostedSites.list().pipe(toHostedSiteOperationFailed),
@@ -3330,6 +3346,7 @@ export async function createApplicationServices({
       existsSync(HOSTED_UPDATE_TRIGGER));
   // A local server is the same application as its parent, which installs the update for both.
   const updatesEnabled =
+    !isEvolutionBuild() &&
     !localServerChild &&
     app.isPackaged &&
     !isNixStoreInstall() &&

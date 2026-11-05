@@ -252,7 +252,7 @@ export interface AgentSummary {
   quickAcknowledgement?: boolean;
   /**
    * Whether the browser tabs of the agent use a session of their own, with their own cookies and
-   * sign-ins. Local-only, like `access`. Absent means off: the tabs use the shared session. When
+   * sign-ins. Local-only, like `access`. Absent means isolated; `false` opts into the shared session. When
    * `browserProfileId` is also set, the named profile applies; see `agentBrowserProfile`.
    */
   ownBrowserSession?: boolean;
