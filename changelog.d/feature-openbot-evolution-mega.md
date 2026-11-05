@@ -7,3 +7,4 @@
 ### Changed
 
 - Agents are told to search saved memories before asking the user to repeat an earlier preference, decision, result, or project fact that is not already in essential context.
+- Desktop chats now keep live steps open by default and show parallel subagents inside the same execution surface. When a turn ends, the full step and subagent history remains available in the conversation.

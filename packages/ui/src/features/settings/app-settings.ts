@@ -90,7 +90,7 @@ export const DEFAULT_GENERAL_SETTINGS: GeneralSettingsValue = {
   macBookNotchNewServers: true,
   taskSound: "classic",
   sendShortcut: "enter",
-  showAgentSteps: false,
+  showAgentSteps: true,
   busyMessageMode: "queue",
   agentDefaults: DEFAULT_AGENT_DEFAULTS,
   agentMemoryLimit: DEFAULT_AGENT_MEMORY_LIMIT,

@@ -1,3 +1,4 @@
+import type { ConversationSubagent } from "@openbot/contracts/ipc";
 import type { AppTextKey } from "@openbot/i18n";
 import type { JSX } from "@solidjs/web";
 import { createEffect, createMemo, createSignal, createUniqueId, Show } from "solid-js";
@@ -7,6 +8,7 @@ import { ChevronDown } from "../../icons";
 import { useText } from "../../text";
 import { AgentAvatar } from "../agents/AgentAvatar";
 import { type AgentStep, AgentStepList } from "./AgentSteps";
+import { SubagentGroup } from "./Subagents";
 
 /**
  * The English source of each label. A label is an identifier here: render it with
@@ -83,6 +85,10 @@ export function AgentActivityIndicator(props: {
   steps?: readonly AgentStep[] | undefined;
   /** The "Show agent steps" setting: the steps are open when the turn starts. */
   stepsOpenByDefault?: boolean | undefined;
+  /** Subagents started by this turn. They stay in the same live execution surface as its steps. */
+  subagents?: readonly ConversationSubagent[] | undefined;
+  selectedSubagentId?: string | null | undefined;
+  onOpenSubagent?: ((subagentId: string) => void) | undefined;
   /**
    * The provider name, when nothing has come from the provider for a while or the computer has no
    * network. The line then says that it waits, with no shine, because a silent provider is not visible work.
@@ -122,6 +128,9 @@ export function AgentActivityIndicator(props: {
       <AgentActivityBody
         steps={props.steps}
         stepsOpenByDefault={props.stepsOpenByDefault}
+        subagents={props.subagents}
+        selectedSubagentId={props.selectedSubagentId}
+        onOpenSubagent={props.onOpenSubagent}
         live={props.phase !== "exiting"}
       >
         <AgentAvatar agent={props.agent} mood={mood()} class="agent-activity-avatar" />
@@ -142,6 +151,9 @@ export function AgentActivityBody(props: {
   steps?: readonly AgentStep[] | undefined;
   /** The "Show agent steps" setting: the steps are open when the work starts. */
   stepsOpenByDefault?: boolean | undefined;
+  subagents?: readonly ConversationSubagent[] | undefined;
+  selectedSubagentId?: string | null | undefined;
+  onOpenSubagent?: ((subagentId: string) => void) | undefined;
   live: boolean;
   children: JSX.Element;
 }) {
@@ -180,6 +192,13 @@ export function AgentActivityBody(props: {
         <div class="agent-activity-steps">
           <AgentStepList id={stepsId} steps={props.steps ?? []} live={props.live} />
         </div>
+      </Show>
+      <Show when={(props.subagents?.length ?? 0) > 0 ? props.onOpenSubagent : undefined}>
+        {(onOpen) => (
+          <div class="agent-activity-subagents">
+            <SubagentGroup subagents={props.subagents ?? []} selectedId={props.selectedSubagentId} onOpen={onOpen()} />
+          </div>
+        )}
       </Show>
     </div>
   );

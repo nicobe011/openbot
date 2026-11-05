@@ -34,6 +34,14 @@
   padding-inline: var(--openbot-space-6) 0;
 }
 
+/* Parallel workers belong to the same live execution as the main agent. The shared indent keeps
+   their expandable history on the same vertical track as the main turn steps. */
+.agent-activity-subagents {
+  padding-block: 0 var(--openbot-space-2);
+  padding-inline: var(--openbot-space-6) 0;
+  pointer-events: auto;
+}
+
 .agent-steps-chevron {
   width: var(--openbot-icon-xs);
   height: var(--openbot-icon-xs);
