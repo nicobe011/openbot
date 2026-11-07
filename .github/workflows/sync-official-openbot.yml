@@ -1,0 +1,54 @@
+name: Sync official OpenBot
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/sync-official-openbot.yml"
+  schedule:
+    - cron: "17 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-official-openbot
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout private copy
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Sync from official repository
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp .github/workflows/sync-official-openbot.yml /tmp/sync-official-openbot.yml
+          git remote remove upstream 2>/dev/null || true
+          git remote add upstream https://github.com/nightly-labs/openbot.git
+
+          # If upstream ever disappears, leave this repository untouched.
+          if ! git fetch --prune upstream main; then
+            echo "Official upstream unavailable. Preserving current private copy."
+            exit 0
+          fi
+
+          git checkout -B main upstream/main
+          mkdir -p .github/workflows
+          cp /tmp/sync-official-openbot.yml .github/workflows/sync-official-openbot.yml
+
+          git config user.name "openbot-sync"
+          git config user.email "openbot-sync@users.noreply.github.com"
+          git add -A
+
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: keep standalone sync workflow"
+          fi
+
+          git push --force origin main
