@@ -1,10 +1,6 @@
-name: Sync official OpenBot
+name: Sync official OpenBot safely
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/sync-official-openbot.yml"
   schedule:
     - cron: "17 */6 * * *"
   workflow_dispatch:
@@ -20,35 +16,51 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout private copy
+      - name: Checkout our repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Sync from official repository
+      - name: Sync official source with safety guardrails
         shell: bash
         run: |
           set -euo pipefail
-          cp .github/workflows/sync-official-openbot.yml /tmp/sync-official-openbot.yml
+
+          cp .github/workflows/sync-official-openbot.yml /tmp/trusted-sync.yml
+
           git remote remove upstream 2>/dev/null || true
           git remote add upstream https://github.com/nightly-labs/openbot.git
 
-          # If upstream ever disappears, leave this repository untouched.
+          # If the official repository disappears or cannot be fetched,
+          # do NOTHING. Our current repository remains intact.
           if ! git fetch --prune upstream main; then
-            echo "Official upstream unavailable. Preserving current private copy."
+            echo "Upstream unavailable. Keeping our current repository unchanged."
             exit 0
           fi
 
           git checkout -B main upstream/main
-          mkdir -p .github/workflows
-          cp /tmp/sync-official-openbot.yml .github/workflows/sync-official-openbot.yml
 
-          git config user.name "openbot-sync"
-          git config user.email "openbot-sync@users.noreply.github.com"
-          git add -A
-
-          if ! git diff --cached --quiet; then
-            git commit -m "chore: keep standalone sync workflow"
+          # Keep upstream workflow SOURCE for reference, but never allow
+          # upstream-provided workflows to execute inside our repository.
+          if [ -d .github/workflows ]; then
+            mkdir -p upstream-workflows-disabled
+            find .github/workflows -maxdepth 1 -type f -print0 | while IFS= read -r -d '' f; do
+              cp "$f" "upstream-workflows-disabled/$(basename "$f").txt"
+            done
+            rm -rf .github/workflows
           fi
 
+          mkdir -p .github/workflows
+          cp /tmp/trusted-sync.yml .github/workflows/sync-official-openbot.yml
+
+          git config user.name "openbot-safe-sync"
+          git config user.email "openbot-safe-sync@users.noreply.github.com"
+
+          git add -A
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: safe standalone sync from official OpenBot"
+          fi
+
+          # This only replaces files/commits in THIS repository.
+          # It has no repository-administration/delete permission.
           git push --force origin main
